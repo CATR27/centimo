@@ -112,8 +112,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   async function social(p: Provider) {
     setErrors({}); setNotice(null);
-    if (enabled && !enabled[p]) { setErrors({ form: "Este método aún no está activado. Usa Google o tu correo." }); return; }
     setBusy(p);
+    // Si la consulta de proveedores aún no terminó, la esperamos antes de redirigir.
+    const status = enabled ?? (await getProviderStatus());
+    if (!status[p]) {
+      setEnabled(status);
+      setErrors({ form: "Este método aún no está activado. Usa tu correo o un enlace mágico." });
+      setBusy(null);
+      return;
+    }
     const err = await signInWithProvider(p);
     if (err) { setErrors({ form: err }); setBusy(null); }
     else if (isDemo) router.replace("/dashboard");
