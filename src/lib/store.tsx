@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { localRepo } from "./data/local-repo";
 import { supabaseRepo } from "./data/supabase-repo";
 import type { Repo } from "./data/repo";
-import { setPrivacy } from "./money";
+import { newlyCrossed } from "./budget";
+import { formatMoney, setPrivacy } from "./money";
 import { isDemo } from "./supabase/env";
 import { nextOccurrence } from "./dates";
 import { uid } from "./utils";
@@ -28,7 +29,7 @@ interface Store extends Snapshot {
   togglePrivacy: () => void;
 }
 
-const EMPTY: Snapshot = { categories: [], transactions: [], settings: { currency: "COP", displayName: "" } };
+const EMPTY: Snapshot = { categories: [], transactions: [], settings: { currency: "COP", displayName: "", monthlyBudget: null } };
 const Ctx = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -74,6 +75,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       ...snap, ready, demo: isDemo, reload, privacy, togglePrivacy,
       addTx: (t) => {
         const tx: Transaction = { ...t, id: t.id ?? uid() };
+        const before = snapRef.current;
+        if (tx.type === "expense" && tx.status === "paid") {
+          for (const a of newlyCrossed(before, upsert(before.transactions, tx))) {
+            const msg = `${a.name}: ${Math.round(a.ratio * 100)}% (${formatMoney(a.spent, before.settings.currency)} de ${formatMoney(a.budget, before.settings.currency)})`;
+            if (a.level === "over") toast.error("Presupuesto superado", { description: msg });
+            else toast.warning("Cerca del límite de presupuesto", { description: msg });
+          }
+        }
         mutate((s) => ({ ...s, transactions: upsert(s.transactions, tx) }), () => repo.saveTx(tx));
       },
       updateTx: (tx) => mutate((s) => ({ ...s, transactions: upsert(s.transactions, tx) }), () => repo.saveTx(tx)),

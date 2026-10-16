@@ -69,5 +69,5 @@ export function demoSnapshot(): Snapshot {
   for (const [categoryId, note, amount, ahead, recurrence] of planned) {
     add({ categoryId, note, amount, type: "expense", date: addDaysISO(t, ahead), status: "planned", recurrence });
   }
-  return { categories: DEFAULT_CATEGORIES, transactions: txs, settings: { currency: "COP", displayName: "Trader" } };
+  return { categories: DEFAULT_CATEGORIES, transactions: txs, settings: { currency: "COP", displayName: "Trader", monthlyBudget: 4_200_000 } };
 }

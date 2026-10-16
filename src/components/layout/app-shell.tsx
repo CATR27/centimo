@@ -37,7 +37,7 @@ function Frame({ children }: { children: ReactNode }) {
     <div className="min-h-dvh lg:pl-[80px]">
       <Rail />
       <TopBar />
-      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 lg:max-w-6xl lg:px-10 lg:pb-12 lg:pt-10">
+      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 lg:max-w-[1400px] lg:px-8 lg:pb-12 lg:pt-10">
         {children}
       </main>
       <Dock />

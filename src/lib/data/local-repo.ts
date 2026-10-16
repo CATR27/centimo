@@ -7,7 +7,10 @@ const KEY = "centimo:demo:v1";
 function read(): Snapshot {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw) as Snapshot;
+    if (raw) {
+      const snap = JSON.parse(raw) as Snapshot;
+      return { ...snap, settings: { ...snap.settings, monthlyBudget: snap.settings.monthlyBudget ?? null } };
+    }
   } catch {}
   const s = demoSnapshot();
   write(s);

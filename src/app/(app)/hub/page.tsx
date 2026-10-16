@@ -7,6 +7,7 @@ import { AnimatedIcon } from "@/components/animated-icon";
 import { NAV_GROUPS } from "@/components/layout/nav-config";
 import { useQuickAdd } from "@/components/transactions/quick-add";
 import { Delta, Skeleton } from "@/components/ui/misc";
+import { BudgetAlertsCard, InsightsCard } from "@/components/widgets";
 import { delta, totals, upcoming } from "@/lib/analytics";
 import { periodRanges, relativeDay } from "@/lib/dates";
 import { formatCompact, formatMoney } from "@/lib/money";
@@ -59,6 +60,9 @@ export default function Hub() {
           <Stat label="Próximo" value={m.next ? relativeDay(m.next.date) : "—"} sub={m.next ? formatCompact(m.next.amount, cur) : undefined} />
         </div>
       </section>
+
+      <InsightsCard limit={3} />
+      <BudgetAlertsCard />
 
       {/* Accesos */}
       {sections.map((g) => (

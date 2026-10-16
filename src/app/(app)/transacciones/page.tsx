@@ -60,7 +60,7 @@ export default function Transacciones() {
 
       {!ready ? <div className="space-y-2"><Skeleton className="h-16" /><Skeleton className="h-16" /><Skeleton className="h-16" /></div>
         : groups.length === 0 ? <EmptyState title="Sin resultados" hint="Prueba con otros filtros." /> : (
-        <div className="space-y-5">
+        <div className="grid items-start gap-5 lg:grid-cols-2">
           {groups.map(([date, list]) => {
             const net = list.reduce((a, t) => a + (t.type === "income" ? t.amount : -t.amount), 0);
             return (
@@ -76,7 +76,7 @@ export default function Transacciones() {
             );
           })}
           {filtered.length > limit && (
-            <button onClick={() => setLimit((l) => l + 60)} className="h-12 w-full rounded-xl border border-line text-sm text-muted">
+            <button onClick={() => setLimit((l) => l + 60)} className="h-12 w-full lg:col-span-2 rounded-xl border border-line text-sm text-muted">
               Cargar más
             </button>
           )}

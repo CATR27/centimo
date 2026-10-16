@@ -30,7 +30,7 @@ export const supabaseRepo: Repo = {
     const [cats, txs, profile] = await Promise.all([
       sb.from("categories").select("*").order("created_at"),
       sb.from("transactions").select("*").order("date", { ascending: false }).limit(5000),
-      sb.from("profiles").select("display_name,currency").maybeSingle(),
+      sb.from("profiles").select("*").maybeSingle(),
     ]);
     check(cats.error); check(txs.error); check(profile.error);
     return {
@@ -39,6 +39,7 @@ export const supabaseRepo: Repo = {
       settings: {
         currency: profile.data?.currency ?? "COP",
         displayName: profile.data?.display_name ?? "",
+        monthlyBudget: profile.data?.monthly_budget == null ? null : Number(profile.data.monthly_budget),
       },
     };
   },
@@ -62,8 +63,10 @@ export const supabaseRepo: Repo = {
   async saveSettings(s: Settings) {
     const { data } = await supabase().auth.getUser();
     if (!data.user) throw new Error("Sesión expirada");
+    // monthly_budget solo se envía si hay valor: así funciona aunque la migración 0002 aún no se haya aplicado.
     check((await supabase().from("profiles").upsert({
       id: data.user.id, display_name: s.displayName, currency: s.currency,
+      ...(s.monthlyBudget !== null ? { monthly_budget: s.monthlyBudget } : {}),
     })).error);
   },
 };

@@ -20,6 +20,7 @@ export default function Categorias() {
     <div>
       <PageHeader title="Categorías" sub="Colores, iconos y presupuestos"
         right={<Button onClick={() => setEdit({ kind: "expense", icon: "tag", color: NEON_COLORS[0], monthlyBudget: null })}><Plus className="size-4" /> Nueva</Button>} />
+      <div className="grid items-start gap-x-8 lg:grid-cols-[1.4fr_1fr]">
       {(["expense", "income"] as const).map((kind) => (
         <section key={kind} className="mb-6">
           <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{kind === "expense" ? "Gastos" : "Ingresos"}</h2>
@@ -41,6 +42,7 @@ export default function Categorias() {
           </div>
         </section>
       ))}
+      </div>
       <Sheet open={!!edit} onClose={() => setEdit(null)} title={edit?.id ? "Editar categoría" : "Nueva categoría"}>
         {edit && <CatForm key={edit.id ?? "new"} initial={edit} onClose={() => setEdit(null)} />}
       </Sheet>

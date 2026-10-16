@@ -28,6 +28,8 @@ export interface Transaction {
 export interface Settings {
   currency: string;
   displayName: string;
+  /** presupuesto global mensual en unidades menores (null = sin límite) */
+  monthlyBudget: number | null;
 }
 
 export interface Snapshot {

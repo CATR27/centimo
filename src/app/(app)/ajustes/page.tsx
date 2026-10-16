@@ -9,7 +9,7 @@ import { Card, SectionTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ThemeSwitch } from "@/components/ui/misc";
 import { signOut } from "@/lib/auth";
-import { CURRENCIES, toMajor } from "@/lib/money";
+import { CURRENCIES, currencySymbol, toMajor, toMinor } from "@/lib/money";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +45,20 @@ export default function Ajustes() {
         <SectionTitle>Perfil</SectionTitle>
         <Input defaultValue={settings.displayName} placeholder="Tu nombre" maxLength={40} aria-label="Nombre"
           onBlur={(e) => e.target.value.trim() !== settings.displayName && updateSettings({ displayName: e.target.value.trim() })} />
+      </Card>
+      <Card className="space-y-3">
+        <SectionTitle>Presupuesto global del mes</SectionTitle>
+        <Input
+          key={`${settings.currency}-${settings.monthlyBudget ?? "none"}`} inputMode="decimal" aria-label="Presupuesto mensual"
+          placeholder={`Sin límite (${currencySymbol(settings.currency)})`}
+          defaultValue={settings.monthlyBudget ? String(toMajor(settings.monthlyBudget, settings.currency)) : ""}
+          onBlur={(e) => {
+            const n = Number(e.target.value.replace(/[^\d.]/g, ""));
+            const next = n > 0 ? toMinor(n, settings.currency) : null;
+            if (next !== settings.monthlyBudget) updateSettings({ monthlyBudget: next });
+          }}
+        />
+        <p className="text-xs text-muted">Te avisamos al llegar al 80% y al 100% del gasto del mes. También puedes poner un límite por categoría.</p>
       </Card>
       <Card>
         <SectionTitle>Apariencia</SectionTitle>
