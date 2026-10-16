@@ -66,10 +66,10 @@ export default function Transacciones() {
             return (
               <section key={date}>
                 <div className="mb-1 flex items-center justify-between px-1 text-xs">
-                  <h2 className="font-semibold capitalize text-muted">{dayHeading(date)}</h2>
+                  <h2 className="font-semibold lowercase text-muted first-letter:uppercase">{dayHeading(date)}</h2>
                   <span className="num text-muted">{net < 0 ? "−" : "+"}{formatMoney(Math.abs(net), settings.currency)}</span>
                 </div>
-                <div className="divide-y divide-line/60 rounded-2xl border border-line bg-surface px-3">
+                <div className="divide-y divide-line/60 rounded-3xl border border-line bg-surface px-3">
                   {list.map((t) => <TxRow key={t.id} tx={t} />)}
                 </div>
               </section>

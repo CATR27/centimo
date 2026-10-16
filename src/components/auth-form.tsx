@@ -94,7 +94,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               />
               <button
                 type="button" onClick={() => setShow((s) => !s)} aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
-                className="absolute right-1 top-1 grid size-10 place-items-center text-muted"
+                className="absolute right-1.5 top-1.5 grid size-10 place-items-center rounded-full text-muted"
               >
                 {show ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
               </button>
@@ -104,12 +104,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
         {mode === "login" && (
           <div className="text-right">
-            <Link href="/forgot" className="text-xs text-muted hover:text-accent">¿Olvidaste tu contraseña?</Link>
+            <Link href="/forgot" className="text-xs font-medium text-muted hover:text-ink">¿Olvidaste tu contraseña?</Link>
           </div>
         )}
 
-        {errors.form && <p role="alert" className="rounded-lg bg-neg/10 px-3 py-2 text-sm text-neg">{errors.form}</p>}
-        {notice && <p role="status" className="rounded-lg bg-pos/10 px-3 py-2 text-sm text-pos">{notice}</p>}
+        {errors.form && <p role="alert" className="rounded-2xl bg-neg/10 px-4 py-2.5 text-sm text-neg">{errors.form}</p>}
+        {notice && <p role="status" className="rounded-2xl bg-pos/10 px-4 py-2.5 text-sm text-pos">{notice}</p>}
 
         <Button type="submit" size="lg" className="w-full" disabled={busy}>
           {busy && <Loader2 className="size-4 animate-spin" />} {copy.cta}
@@ -134,9 +134,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
       )}
 
       <p className="mt-7 text-center text-sm text-muted">
-        {mode === "login" && <>¿Sin cuenta? <Link href="/signup" className="font-medium text-accent">Regístrate</Link></>}
-        {mode === "signup" && <>¿Ya tienes cuenta? <Link href="/login" className="font-medium text-accent">Entra</Link></>}
-        {mode === "forgot" && <Link href="/login" className="font-medium text-accent">Volver a entrar</Link>}
+        {mode === "login" && <>¿Sin cuenta? <Link href="/signup" className="font-semibold text-ink underline underline-offset-4">Regístrate</Link></>}
+        {mode === "signup" && <>¿Ya tienes cuenta? <Link href="/login" className="font-semibold text-ink underline underline-offset-4">Entra</Link></>}
+        {mode === "forgot" && <Link href="/login" className="font-semibold text-ink underline underline-offset-4">Volver a entrar</Link>}
       </p>
     </div>
   );

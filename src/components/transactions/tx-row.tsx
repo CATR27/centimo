@@ -18,8 +18,8 @@ export function TxRow({ tx, showDate = false, onPay }: { tx: Transaction; showDa
 
   return (
     <div className="flex items-center gap-1">
-      <button onClick={() => open({ tx })} className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-xl py-2 text-left active:bg-surface-2">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl"
+      <button onClick={() => open({ tx })} className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-2xl py-2 text-left active:bg-surface-2">
+        <span className="grid size-12 shrink-0 place-items-center rounded-full"
           style={{ background: `color-mix(in srgb, ${color} 16%, transparent)`, color }}>
           <CategoryIcon name={cat?.icon ?? "tag"} className="size-5" />
         </span>
@@ -37,7 +37,7 @@ export function TxRow({ tx, showDate = false, onPay }: { tx: Transaction; showDa
       </button>
       {onPay && (
         <button onClick={onPay} aria-label="Marcar como pagado"
-          className="grid size-11 shrink-0 place-items-center rounded-xl border border-accent/40 text-accent active:bg-accent/15">
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-accent-ink active:opacity-80">
           <Check className="size-5" />
         </button>
       )}

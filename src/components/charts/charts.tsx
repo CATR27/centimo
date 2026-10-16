@@ -27,7 +27,7 @@ function Tip({ active, payload, label, currency }: {
 }
 
 /** Área de gasto con degradado y brillo neón. */
-export function SpendArea({ data, currency, color = "var(--neg)", height = 220, cumulative = false, compare }: {
+export function SpendArea({ data, currency, color = "var(--chart)", height = 220, cumulative = false, compare }: {
   data: SeriesPoint[]; currency: string; color?: string; height?: number; cumulative?: boolean; compare?: boolean;
 }) {
   const uid = useId().replace(/:/g, "");
@@ -46,7 +46,7 @@ export function SpendArea({ data, currency, color = "var(--neg)", height = 220, 
           <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={false} minTickGap={24} interval="preserveStartEnd" />
           <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} tickFormatter={(v) => formatCompact(v, currency)} />
           <Tooltip content={<Tip currency={currency} />} cursor={{ stroke: color, strokeOpacity: 0.5, strokeDasharray: "3 3" }} />
-          {compare && <Area dataKey="income" type="monotone" stroke="var(--pos)" strokeWidth={1.5} fill="none" dot={false} />}
+          {compare && <Area dataKey="income" type="monotone" stroke="var(--ink-soft)" strokeWidth={1.5} strokeDasharray="4 4" fill="none" dot={false} />}
           <Area dataKey={key} type="monotone" stroke="none" fill={`url(#g${uid})`} dot={false} activeDot={false} isAnimationActive={false} tooltipType="none" />
           <Area
             dataKey={key} type="monotone" stroke={color} strokeWidth={2.4} fill="none"
@@ -87,7 +87,7 @@ export function CategoryDonut({ data, currency, centerLabel, centerValue, size =
   );
 }
 
-export function WeekdayBars({ data, currency, color = "var(--cyan)" }: {
+export function WeekdayBars({ data, currency, color = "var(--chart)" }: {
   data: { label: string; avg: number }[]; currency: string; color?: string;
 }) {
   const max = Math.max(...data.map((d) => d.avg));
@@ -135,6 +135,18 @@ export function BudgetBar({ ratio, color }: { ratio: number; color: string }) {
     <div className="h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuenow={Math.round(ratio * 100)} aria-valuemin={0} aria-valuemax={100}>
       <div className="h-full rounded-full transition-[width] duration-700"
         style={{ width: `${Math.min(ratio, 1) * 100}%`, background: c }} />
+    </div>
+  );
+}
+
+/** Barras mini (estilo "Fiat Wallets"): último tramo resaltado. */
+export function BarsMini({ values, color = "var(--ink-soft)", height = 36 }: { values: number[]; color?: string; height?: number }) {
+  const max = Math.max(...values, 1);
+  return (
+    <div className="flex items-end gap-[3px]" style={{ height }} aria-hidden>
+      {values.map((v, i) => (
+        <span key={i} className="min-w-[3px] flex-1 rounded-full" style={{ height: `${Math.max(8, (v / max) * 100)}%`, background: color, opacity: i === values.length - 1 ? 1 : 0.35 }} />
+      ))}
     </div>
   );
 }
