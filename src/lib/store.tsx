@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { localRepo } from "./data/local-repo";
 import { supabaseRepo } from "./data/supabase-repo";
 import type { Repo } from "./data/repo";
+import { setPrivacy } from "./money";
 import { isDemo } from "./supabase/env";
 import { nextOccurrence } from "./dates";
 import { uid } from "./utils";
@@ -22,6 +23,9 @@ interface Store extends Snapshot {
   removeCategory: (id: string) => void;
   updateSettings: (s: Partial<Settings>) => void;
   reload: () => void;
+  /** Modo privado: oculta los montos en toda la app. */
+  privacy: boolean;
+  togglePrivacy: () => void;
 }
 
 const EMPTY: Snapshot = { categories: [], transactions: [], settings: { currency: "COP", displayName: "" } };
@@ -31,6 +35,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const repo: Repo = isDemo ? localRepo : supabaseRepo;
   const [snap, setSnap] = useState<Snapshot>(EMPTY);
   const [ready, setReady] = useState(false);
+  const [privacy, setPrivacyState] = useState(false);
+  setPrivacy(privacy); // antes de renderizar a los hijos
   const snapRef = useRef(snap);
   snapRef.current = snap;
 
@@ -40,6 +46,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [repo]);
 
   useEffect(reload, [reload]);
+  useEffect(() => {
+    try { setPrivacyState(localStorage.getItem("centimo:privacy") === "1"); } catch {}
+  }, []);
+  const togglePrivacy = useCallback(() => {
+    setPrivacyState((v) => {
+      try { localStorage.setItem("centimo:privacy", v ? "0" : "1"); } catch {}
+      return !v;
+    });
+  }, []);
 
   /** Aplica el cambio local al instante y revierte si el servidor falla. */
   const mutate = useCallback((next: (s: Snapshot) => Snapshot, persist: () => Promise<void>) => {
@@ -56,7 +71,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       list.some((x) => x.id === item.id) ? list.map((x) => (x.id === item.id ? item : x)) : [item, ...list];
 
     return {
-      ...snap, ready, demo: isDemo, reload,
+      ...snap, ready, demo: isDemo, reload, privacy, togglePrivacy,
       addTx: (t) => {
         const tx: Transaction = { ...t, id: t.id ?? uid() };
         mutate((s) => ({ ...s, transactions: upsert(s.transactions, tx) }), () => repo.saveTx(tx));
@@ -94,7 +109,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         mutate((s) => ({ ...s, settings }), () => repo.saveSettings(settings));
       },
     };
-  }, [snap, ready, mutate, repo, reload]);
+  }, [snap, ready, mutate, repo, reload, privacy, togglePrivacy]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

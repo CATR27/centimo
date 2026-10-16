@@ -3,6 +3,8 @@
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { AnimatedIcon } from "@/components/animated-icon";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function Skeleton({ className }: { className?: string }) {
@@ -79,5 +81,21 @@ export function EmptyState({ title, hint }: { title: string; hint?: string }) {
       <p className="text-sm font-medium">{title}</p>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
     </div>
+  );
+}
+
+/** Oculta o muestra todos los montos de la app. */
+export function PrivacyToggle({ className }: { className?: string }) {
+  const { privacy, togglePrivacy } = useStore();
+  return (
+    <button
+      onClick={togglePrivacy} aria-pressed={privacy} aria-label={privacy ? "Mostrar montos" : "Ocultar montos"}
+      title={privacy ? "Mostrar montos" : "Ocultar montos"}
+      className={cn("relative grid size-11 place-items-center rounded-full shadow-sm transition",
+        privacy ? "bg-accent text-accent-ink" : "bg-surface text-ink hover:bg-surface-2", className)}
+    >
+      <AnimatedIcon name="privado" className="size-5" />
+      {privacy && <span aria-hidden className="absolute h-0.5 w-6 -rotate-45 rounded-full bg-current" />}
+    </button>
   );
 }
