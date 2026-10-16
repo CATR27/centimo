@@ -79,7 +79,7 @@ function DockItem({ item, on }: { item: { href: string; label: string; icon: Ico
 }
 
 /* ───────── Riel lateral (escritorio): se despliega al pasar el cursor ───────── */
-const RAIL_ITEM = "relative flex h-[46px] w-full items-center overflow-hidden rounded-full transition-colors";
+const RAIL_ITEM = "relative flex h-[46px] w-full shrink-0 items-center overflow-hidden rounded-full transition-colors [@media(max-height:840px)]:h-10";
 const LABEL = "whitespace-nowrap pr-4 text-sm font-semibold opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100";
 
 export function Rail() {
@@ -93,7 +93,7 @@ export function Rail() {
     >
       <div className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-[17px] no-scrollbar">
         <Link href="/dashboard" aria-label="Inicio" className={cn(RAIL_ITEM, "mb-3 h-12 overflow-visible")}>
-          <span className="grid size-[46px] shrink-0 place-items-center transition-opacity duration-150 group-hover/rail:opacity-0 group-focus-within/rail:opacity-0">
+          <span className="grid h-full w-[46px] shrink-0 place-items-center transition-opacity duration-150 group-hover/rail:opacity-0 group-focus-within/rail:opacity-0">
             <Logo iconOnly className="size-10" />
           </span>
           <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">
@@ -103,13 +103,13 @@ export function Rail() {
 
         <button onClick={() => open()} aria-label="Nuevo movimiento"
           className={cn(RAIL_ITEM, "mb-2 bg-lime text-lime-ink hover:brightness-95")}>
-          <span className="grid size-[46px] shrink-0 place-items-center"><AnimatedIcon name="nuevo" className="size-6" /></span>
+          <span className="grid h-full w-[46px] shrink-0 place-items-center"><AnimatedIcon name="nuevo" className="size-6" /></span>
           <span className={LABEL}>Nuevo movimiento</span>
         </button>
 
         {NAV_GROUPS.map((g) => (
-          <div key={g.title} className="flex flex-col gap-1">
-            <div className="relative my-1.5 h-4">
+          <div key={g.title} className="flex shrink-0 flex-col gap-1">
+            <div className="relative my-1.5 h-4 shrink-0">
               <span aria-hidden className="absolute left-1/2 top-1/2 h-px w-6 -translate-x-1/2 bg-ink/15 transition-opacity group-hover/rail:opacity-0 group-focus-within/rail:opacity-0" />
               <span className="absolute left-3 top-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.14em] text-ink/45 opacity-0 transition-opacity group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">
                 {g.title}
@@ -124,7 +124,7 @@ export function Rail() {
                     <motion.span layoutId="rail-active" transition={{ type: "spring", stiffness: 500, damping: 38 }}
                       className="absolute inset-0 rounded-full bg-accent" />
                   )}
-                  <span className="relative grid size-[46px] shrink-0 place-items-center">
+                  <span className="relative grid h-full w-[46px] shrink-0 place-items-center">
                     <AnimatedIcon name={n.icon} active={on} className="size-6" />
                   </span>
                   <span className={cn("relative", LABEL)}>{n.label}</span>
@@ -139,11 +139,11 @@ export function Rail() {
       <div className="mt-2 flex flex-col gap-1 px-[17px] pt-2">
         <span aria-hidden className="mx-auto mb-1 h-px w-6 bg-ink/15" />
         <div className="flex items-center gap-1 overflow-hidden rounded-full">
-          <span className="grid size-[46px] shrink-0 place-items-center"><PrivacyToggle className="size-[42px]" /></span>
+          <span className="grid h-full w-[46px] shrink-0 place-items-center"><PrivacyToggle className="size-[42px]" /></span>
           <span className="opacity-0 transition-opacity group-hover/rail:opacity-100 group-focus-within/rail:opacity-100"><ThemeToggleIcon /></span>
         </div>
         <div className={cn(RAIL_ITEM, "h-[52px]")} title={settings.displayName}>
-          <span className="grid size-[46px] shrink-0 place-items-center">
+          <span className="grid h-full w-[46px] shrink-0 place-items-center">
             <span className="grid size-10 place-items-center rounded-full bg-surface text-sm font-bold shadow-sm">{initial(settings.displayName)}</span>
           </span>
           <span className={cn("min-w-0 flex-1 truncate text-left", LABEL)}>{settings.displayName || "Cuenta"}</span>
