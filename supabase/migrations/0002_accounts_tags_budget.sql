@@ -42,6 +42,11 @@ insert into public.accounts (user_id, name, type, color)
 select u.id, 'Efectivo', 'cash', '#2a9d7c' from auth.users u
 where not exists (select 1 from public.accounts a where a.user_id = u.id);
 
+-- Movimientos existentes pasan a la primera cuenta de cada usuario.
+update public.transactions t
+set account_id = (select a.id from public.accounts a where a.user_id = t.user_id order by a.created_at limit 1)
+where t.account_id is null;
+
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin

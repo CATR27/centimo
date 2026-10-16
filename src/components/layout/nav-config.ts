@@ -26,7 +26,9 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Gestión",
     items: [
+      { href: "/cuentas", label: "Cuentas", icon: "cuentas", hint: "Saldos y transferencias" },
       { href: "/categorias", label: "Categorías", icon: "categorias", hint: "Colores y presupuestos" },
+      { href: "/importar", label: "Importar", icon: "importar", hint: "Desde CSV del banco" },
       { href: "/ajustes", label: "Ajustes", icon: "ajustes", hint: "Moneda, tema, datos" },
     ],
   },

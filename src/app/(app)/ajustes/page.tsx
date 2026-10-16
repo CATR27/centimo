@@ -14,16 +14,17 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function Ajustes() {
-  const { settings, updateSettings, transactions, categories, demo } = useStore();
+  const { settings, updateSettings, transactions, categories, accounts, demo } = useStore();
   const router = useRouter();
 
   function exportCsv() {
     const esc = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const rows = [["fecha", "tipo", "estado", "categoria", "monto", "nota", "recurrencia"].join(",")];
+    const rows = [["fecha", "tipo", "estado", "categoria", "cuenta", "monto", "nota", "etiquetas", "recurrencia"].join(",")];
     for (const t of [...transactions].sort((a, b) => a.date.localeCompare(b.date))) {
       rows.push([
         t.date, t.type, t.status, esc(categories.find((c) => c.id === t.categoryId)?.name ?? ""),
-        toMajor(t.amount, settings.currency), esc(t.note), t.recurrence ?? "",
+        esc(accounts.find((a) => a.id === (t.accountId ?? accounts[0]?.id))?.name ?? ""),
+        toMajor(t.amount, settings.currency), esc(t.note), esc((t.tags ?? []).join(" ")), t.recurrence ?? "",
       ].join(","));
     }
     const url = URL.createObjectURL(new Blob(["﻿" + rows.join("\n")], { type: "text/csv;charset=utf-8" }));

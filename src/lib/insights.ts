@@ -20,7 +20,7 @@ export function buildInsights(
   txs: Transaction[], cats: Category[], fmt: (minor: number) => string, now = new Date(),
 ): Insight[] {
   const out: Insight[] = [];
-  const paidExp = txs.filter((t) => t.status === "paid" && t.type === "expense");
+  const paidExp = txs.filter((t) => t.status === "paid" && t.type === "expense" && !t.transferId);
   const month = periodRanges("MES", now).current;
   const prevMonth = periodRanges("MES", subMonths(now, 1)).current;
   const dayOfMonth = getDate(now);

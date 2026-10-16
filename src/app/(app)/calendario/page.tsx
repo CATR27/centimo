@@ -40,7 +40,7 @@ export default function Calendario() {
     let spent = 0, income = 0, planned = 0, max = 0;
     for (const d of days) {
       if (!isSameMonth(d, cursor)) continue;
-      const list = byDay.get(toISO(d)) ?? [];
+      const list = (byDay.get(toISO(d)) ?? []).filter((t) => !t.transferId);
       const day = list.filter((t) => t.status === "paid" && t.type === "expense").reduce((a, t) => a + t.amount, 0);
       spent += day; max = Math.max(max, day);
       income += list.filter((t) => t.status === "paid" && t.type === "income").reduce((a, t) => a + t.amount, 0);
@@ -79,7 +79,7 @@ export default function Calendario() {
           <div className="mt-1 grid grid-cols-7 gap-1" role="grid" aria-label={monthLabel}>
             {days.map((d) => {
               const iso = toISO(d);
-              const list = byDay.get(iso) ?? [];
+              const list = (byDay.get(iso) ?? []).filter((t) => !t.transferId);
               const spent = list.filter((t) => t.status === "paid" && t.type === "expense").reduce((a, t) => a + t.amount, 0);
               const inMonth = isSameMonth(d, cursor);
               const heat = stats.max > 0 ? Math.min(1, spent / stats.max) : 0;

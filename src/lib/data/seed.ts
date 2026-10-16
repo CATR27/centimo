@@ -1,5 +1,5 @@
 import { addDaysISO, today } from "../dates";
-import type { Category, Snapshot, Transaction } from "../types";
+import type { Account, Category, Snapshot, Transaction } from "../types";
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: "c-food", name: "Comida", icon: "utensils", color: "#ff6b35", kind: "expense", monthlyBudget: 600_000 },
@@ -14,6 +14,12 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: "c-other", name: "Otros ingresos", icon: "trending", color: "#2dd4bf", kind: "income", monthlyBudget: null },
 ];
 
+export const DEFAULT_ACCOUNTS: Account[] = [
+  { id: "a-cash", name: "Efectivo", type: "cash", color: "#2a9d7c", openingBalance: 2_500_000 },
+  { id: "a-bank", name: "Banco", type: "bank", color: "#4d7cff", openingBalance: 1_800_000 },
+  { id: "a-card", name: "Tarjeta", type: "card", color: "#ff6b35", openingBalance: 0 },
+];
+
 /** PRNG determinista para que el demo se vea igual en cada carga. */
 function rng(seed: number) {
   return () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
@@ -25,7 +31,7 @@ export function demoSnapshot(): Snapshot {
   const txs: Transaction[] = [];
   let n = 0;
   const add = (p: Omit<Transaction, "id" | "recurrence" | "status"> & Partial<Transaction>) =>
-    txs.push({ id: `d-${n++}`, status: "paid", recurrence: null, ...p });
+    txs.push({ id: `d-${n++}`, status: "paid", recurrence: null, accountId: null, tags: [], ...p });
 
   const spend: [string, number, number, string[]][] = [
     ["c-food", 12_000, 70_000, ["Almuerzo", "Domicilio", "Supermercado", "Café", "Cena fuera"]],
@@ -40,21 +46,27 @@ export function demoSnapshot(): Snapshot {
     const count = r() < 0.55 ? 1 : r() < 0.3 ? 2 : 0;
     for (let k = 0; k < count; k++) {
       const [cat, lo, hi, notes] = spend[Math.floor(r() * spend.length)];
+      const pick = r();
       add({
         categoryId: cat, type: "expense", date,
         amount: Math.round((lo + r() * (hi - lo)) / 500) * 500,
         note: notes[Math.floor(r() * notes.length)],
+        accountId: pick < 0.35 ? "a-cash" : pick < 0.65 ? "a-bank" : "a-card",
+        tags: cat === "c-fun" && r() < 0.5 ? ["amigos"] : cat === "c-transit" && r() < 0.4 ? ["trabajo"] : [],
       });
     }
   }
   // Ingresos y fijos mensuales (últimos 4 meses)
   for (let m = 0; m < 4; m++) {
     const base = addDaysISO(t, -m * 30);
-    add({ categoryId: "c-salary", type: "income", date: addDaysISO(base, -3), amount: 4_800_000, note: "Nómina" });
-    add({ categoryId: "c-home", type: "expense", date: addDaysISO(base, -6), amount: 1_150_000, note: "Arriendo" });
+    add({ categoryId: "c-salary", type: "income", date: addDaysISO(base, -3), amount: 4_800_000, note: "Nómina", accountId: "a-bank" });
+    add({ categoryId: "c-home", type: "expense", date: addDaysISO(base, -6), amount: 1_150_000, note: "Arriendo", accountId: "a-bank" });
     add({ categoryId: "c-subs", type: "expense", date: addDaysISO(base, -9), amount: 39_900, note: "Spotify + Netflix" });
   }
-  add({ categoryId: "c-other", type: "income", date: addDaysISO(t, -12), amount: 650_000, note: "Freelance" });
+  add({ categoryId: "c-other", type: "income", date: addDaysISO(t, -12), amount: 650_000, note: "Freelance", accountId: "a-bank", tags: ["trabajo"] });
+  // Transferencia de ejemplo: del banco a efectivo
+  add({ categoryId: null, type: "expense", date: addDaysISO(t, -5), amount: 300_000, note: "Transferencia a Efectivo", accountId: "a-bank", transferId: "t-1" });
+  add({ categoryId: null, type: "income", date: addDaysISO(t, -5), amount: 300_000, note: "Transferencia desde Banco", accountId: "a-cash", transferId: "t-1" });
 
   // Próximos
   const planned: [string, string, number, number, Transaction["recurrence"]][] = [
@@ -69,5 +81,5 @@ export function demoSnapshot(): Snapshot {
   for (const [categoryId, note, amount, ahead, recurrence] of planned) {
     add({ categoryId, note, amount, type: "expense", date: addDaysISO(t, ahead), status: "planned", recurrence });
   }
-  return { categories: DEFAULT_CATEGORIES, transactions: txs, settings: { currency: "COP", displayName: "Trader", monthlyBudget: 4_200_000 } };
+  return { accounts: DEFAULT_ACCOUNTS, categories: DEFAULT_CATEGORIES, transactions: txs, settings: { currency: "COP", displayName: "Trader", monthlyBudget: 4_200_000 } };
 }

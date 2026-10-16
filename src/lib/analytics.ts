@@ -3,7 +3,8 @@ import { eachDayOfInterval, eachMonthOfInterval, format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Category, Transaction } from "./types";
 
-const paid = (t: Transaction) => t.status === "paid";
+/** Pagado y que no sea una transferencia entre cuentas (no es ingreso ni gasto real). */
+const paid = (t: Transaction) => t.status === "paid" && !t.transferId;
 
 export function totals(txs: Transaction[], r: Range) {
   let income = 0, expense = 0;

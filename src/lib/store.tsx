@@ -10,7 +10,7 @@ import { formatMoney, setPrivacy } from "./money";
 import { isDemo } from "./supabase/env";
 import { nextOccurrence } from "./dates";
 import { uid } from "./utils";
-import type { Category, Settings, Snapshot, Transaction } from "./types";
+import type { Account, Category, Settings, Snapshot, Transaction } from "./types";
 
 interface Store extends Snapshot {
   ready: boolean;
@@ -20,6 +20,12 @@ interface Store extends Snapshot {
   removeTx: (id: string) => void;
   /** Marca un próximo como pagado; si es recurrente, programa el siguiente. */
   markPaid: (id: string) => void;
+  /** Guarda muchos movimientos de una vez (importación CSV). Devuelve cuántos se guardaron. */
+  addMany: (txs: Omit<Transaction, "id">[]) => number;
+  /** Mueve dinero entre cuentas creando un par de movimientos enlazados. */
+  addTransfer: (t: { fromId: string; toId: string; amount: number; date: string; note?: string }) => void;
+  saveAccount: (a: Omit<Account, "id"> & { id?: string }) => void;
+  removeAccount: (id: string) => void;
   saveCategory: (c: Omit<Category, "id"> & { id?: string }) => void;
   removeCategory: (id: string) => void;
   updateSettings: (s: Partial<Settings>) => void;
@@ -29,7 +35,7 @@ interface Store extends Snapshot {
   togglePrivacy: () => void;
 }
 
-const EMPTY: Snapshot = { categories: [], transactions: [], settings: { currency: "COP", displayName: "", monthlyBudget: null } };
+const EMPTY: Snapshot = { accounts: [], categories: [], transactions: [], settings: { currency: "COP", displayName: "", monthlyBudget: null } };
 const Ctx = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -99,6 +105,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           async () => { await repo.saveTx(paidTx); if (follow) await repo.saveTx(follow); },
         );
         toast.success("Marcado como pagado");
+      },
+      addMany: (list) => {
+        const txs: Transaction[] = list.map((t) => ({ ...t, id: uid() }));
+        if (!txs.length) return 0;
+        mutate((s) => ({ ...s, transactions: [...txs, ...s.transactions] }), () => repo.saveTxs(txs));
+        return txs.length;
+      },
+      addTransfer: ({ fromId, toId, amount, date, note }) => {
+        const accounts = snapRef.current.accounts;
+        const from = accounts.find((a) => a.id === fromId);
+        const to = accounts.find((a) => a.id === toId);
+        if (!from || !to || fromId === toId || amount <= 0) return;
+        const transferId = uid();
+        const base = { categoryId: null, amount, date, status: "paid" as const, recurrence: null, tags: [], transferId };
+        const out: Transaction = { ...base, id: uid(), type: "expense", accountId: fromId, note: note || `Transferencia a ${to.name}` };
+        const inn: Transaction = { ...base, id: uid(), type: "income", accountId: toId, note: note || `Transferencia desde ${from.name}` };
+        mutate((s) => ({ ...s, transactions: [out, inn, ...s.transactions] }), () => repo.saveTxs([out, inn]));
+        toast.success("Transferencia registrada");
+      },
+      saveAccount: (a) => {
+        const acc: Account = { ...a, id: a.id ?? uid() };
+        mutate((s) => ({ ...s, accounts: upsert(s.accounts, acc) }), () => repo.saveAccount(acc));
+      },
+      removeAccount: (id) => {
+        if (snapRef.current.accounts.length <= 1) { toast.error("Debes conservar al menos una cuenta"); return; }
+        mutate(
+          (s) => ({
+            ...s,
+            accounts: s.accounts.filter((a) => a.id !== id),
+            transactions: s.transactions.map((t) => (t.accountId === id ? { ...t, accountId: null } : t)),
+          }),
+          () => repo.deleteAccount(id),
+        );
       },
       saveCategory: (c) => {
         const cat: Category = { ...c, id: c.id ?? uid() };

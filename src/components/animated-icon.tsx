@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export type IconName =
   | "panel" | "historial" | "proximos" | "analisis" | "categorias" | "ajustes" | "nuevo"
-  | "hub" | "calendario" | "suscripciones" | "reporte" | "cuentas" | "privado";
+  | "hub" | "calendario" | "suscripciones" | "reporte" | "cuentas" | "privado" | "importar";
 
 /**
  * Nombres de archivos disponibles en /public/animated-icons (p. ej. panel.json).
@@ -163,6 +163,13 @@ function Glyph({ name }: { name: IconName }) {
         <rect x="3.5" y="6.5" width="17" height="13" rx="3.2" />
         <path d="M3.5 10.5h17" />
         <circle className="ai-slide" {...i(0)} style={{ "--dx": "-6px" } as React.CSSProperties} cx="16.5" cy="15" r="1.3" fill="currentColor" stroke="none" />
+      </>);
+    case "importar":
+      return (<>
+        <path d="M4 15v4a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-4" />
+        <g className="ai-slide" style={{ "--dx": "0px", animationName: "ai-drop" } as React.CSSProperties}>
+          <path d="M12 3.5v11M7.5 10.5L12 15l4.500-4.500" />
+        </g>
       </>);
     case "privado":
       return (<>

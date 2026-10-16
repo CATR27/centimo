@@ -17,6 +17,7 @@ export default function Transacciones() {
   const [q, setQ] = useState("");
   const [type, setType] = useState<TxType | "all">("all");
   const [cat, setCat] = useState<string | "all">("all");
+  const [tag, setTag] = useState<string | null>(null);
   const [limit, setLimit] = useState(60);
 
   const filtered = useMemo(() => {
@@ -25,9 +26,11 @@ export default function Transacciones() {
       .filter((t) => t.status === "paid")
       .filter((t) => type === "all" || t.type === type)
       .filter((t) => cat === "all" || t.categoryId === cat)
+      .filter((t) => !tag || (t.tags ?? []).includes(tag))
       .filter((t) => !needle || t.note.toLowerCase().includes(needle) || (categories.find((c) => c.id === t.categoryId)?.name.toLowerCase().includes(needle) ?? false))
       .sort((a, b) => b.date.localeCompare(a.date));
-  }, [transactions, categories, q, type, cat]);
+  }, [transactions, categories, q, type, cat, tag]);
+  const allTags = useMemo(() => [...new Set(transactions.flatMap((t) => t.tags ?? []))].sort(), [transactions]);
 
   const groups = useMemo(() => {
     const m = new Map<string, Transaction[]>();
@@ -54,6 +57,10 @@ export default function Transacciones() {
           <Chip active={cat === "all"} onClick={() => setCat("all")}>Todas</Chip>
           {categories.map((c) => (
             <Chip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)}>{c.name}</Chip>
+          ))}
+          {allTags.length > 0 && <span className="mx-1 w-px shrink-0 bg-line" />}
+          {allTags.map((g) => (
+            <Chip key={g} active={tag === g} onClick={() => setTag(tag === g ? null : g)}>#{g}</Chip>
           ))}
         </HScroll>
       </div>
