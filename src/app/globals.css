@@ -121,6 +121,9 @@ body::before {
 
 .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0.75rem); }
 .pt-safe { padding-top: env(safe-area-inset-top); }
+/* Margen superior = zona segura de iOS (notch / barra de estado) + un respiro extra. */
+.pt-safe-sm { padding-top: calc(env(safe-area-inset-top) + 0.75rem); }
+.pt-safe-lg { padding-top: calc(env(safe-area-inset-top) + 1.25rem); }
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

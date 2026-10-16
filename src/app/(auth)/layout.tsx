@@ -65,7 +65,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <main className="flex min-h-dvh flex-col bg-panel lg:relative lg:min-h-0 lg:bg-transparent">
         {/* Cabecera móvil */}
-        <div className="pt-safe px-5 pb-8 pt-5 lg:hidden">
+        <div className="pt-safe-lg px-5 pb-8 lg:hidden">
           <div className="flex items-center justify-between">
             <Logo className="[&_img]:h-10" />
             <ThemeToggleIcon />

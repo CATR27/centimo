@@ -21,7 +21,7 @@ export function TopBar() {
   const { settings, demo } = useStore();
   const isActive = useActive();
   return (
-    <header className="pt-safe sticky top-0 z-30 bg-panel/90 backdrop-blur-xl print:hidden lg:hidden">
+    <header className="pt-safe-sm sticky top-0 z-30 bg-panel/90 backdrop-blur-xl print:hidden lg:hidden">
       <div className="mx-auto flex h-16 max-w-2xl items-center gap-2 px-4">
         <Link href="/dashboard" aria-label="Inicio" className="mr-auto"><Logo /></Link>
         {demo && <span className="rounded-full bg-lime px-3 py-1.5 text-[10px] font-bold tracking-wider text-lime-ink">DEMO</span>}
