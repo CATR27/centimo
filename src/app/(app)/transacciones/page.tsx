@@ -41,7 +41,7 @@ export default function Transacciones() {
   return (
     <div>
       <PageHeader title="Historial" sub={`${filtered.length} movimientos`} />
-      <div className="sticky top-[5.75rem] z-20 -mx-4 space-y-2.5 bg-bg/90 px-4 pb-3 pt-1 backdrop-blur lg:top-0">
+      <div className="sticky top-[calc(4.75rem+env(safe-area-inset-top))] z-20 -mx-4 space-y-2.5 bg-bg/90 px-4 pb-3 pt-1 backdrop-blur lg:top-0">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted" />
           <input
