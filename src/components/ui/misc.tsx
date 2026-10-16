@@ -1,6 +1,7 @@
 "use client";
 
 import { Moon, Sun, Monitor } from "lucide-react";
+import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { AnimatedIcon } from "@/components/animated-icon";
@@ -11,14 +12,18 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-xl bg-surface-2", className)} />;
 }
 
-export function Logo({ className, iconOnly }: { className?: string; iconOnly?: boolean }) {
+/** Logo oficial. El horizontal alterna según el tema (texto oscuro en claro, texto claro en oscuro). */
+export function Logo({ className, iconOnly, forceLight }: { className?: string; iconOnly?: boolean; forceLight?: boolean }) {
+  if (iconOnly) {
+    return <Image src="/brand/icon.png" alt="Centimo" width={512} height={512} priority className={cn("size-9 rounded-[28%]", className)} />;
+  }
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
-      <svg viewBox="0 0 32 32" className="size-7" aria-hidden>
-        <rect width="32" height="32" rx="16" className="fill-accent" />
-        <path d="M8 20.5c2.6-6 5.2-6 8 0s5.400 6 8 0" fill="none" stroke="var(--accent-ink)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      {!iconOnly && <span className="text-lg">centimo</span>}
+    <span className={cn("inline-flex", className)}>
+      <Image src="/brand/logo-light.png" alt="Centimo" width={749} height={200} priority
+        className={cn("h-9 w-auto", !forceLight && "dark:hidden")} />
+      {!forceLight && (
+        <Image src="/brand/logo-dark.png" alt="Centimo" width={749} height={200} priority className="hidden h-9 w-auto dark:block" />
+      )}
     </span>
   );
 }

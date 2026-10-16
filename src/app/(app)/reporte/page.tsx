@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Printer } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CategoryDonut, SpendArea } from "@/components/charts/charts";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/misc";
+import { Logo, Skeleton } from "@/components/ui/misc";
 import { byCategory, delta, series, totals } from "@/lib/analytics";
 import { fmtDate, toISO } from "@/lib/dates";
 import { formatCompact, formatMoney } from "@/lib/money";
@@ -55,7 +55,8 @@ export default function Reporte() {
       <article className="mx-auto max-w-4xl space-y-6 rounded-[36px] bg-surface p-6 shadow-sm sm:p-10 print:max-w-none print:rounded-none print:p-0 print:shadow-none" aria-label={`Reporte de ${label}`}>
         <header className="flex items-end justify-between border-b border-line pb-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">Centimo · Reporte</p>
+            <Logo forceLight className="mb-3 [&_img]:h-8" />
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">Reporte mensual</p>
             <h2 className="mt-1 text-3xl font-semibold capitalize tracking-tight">{label}</h2>
           </div>
           <p className="text-right text-xs text-muted">{settings.displayName}<br />{fmtDate(r.range.from)} – {fmtDate(r.range.to)}</p>
