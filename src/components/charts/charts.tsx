@@ -9,17 +9,6 @@ import type { CategorySlice, SeriesPoint } from "@/lib/analytics";
 
 const AXIS = { fontSize: 10, fill: "var(--muted)" } as const;
 
-function Glow({ id, color }: { id: string; color: string }) {
-  return (
-    <filter id={id} x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3.2" result="b" />
-      <feFlood floodColor={color} floodOpacity="0.7" />
-      <feComposite in2="b" operator="in" result="g" />
-      <feMerge><feMergeNode in="g" /><feMergeNode in="SourceGraphic" /></feMerge>
-    </filter>
-  );
-}
-
 function Tip({ active, payload, label, currency }: {
   active?: boolean; payload?: { name?: string; value?: number; color?: string; payload?: Record<string, unknown> }[]; label?: string; currency: string;
 }) {
@@ -38,7 +27,7 @@ function Tip({ active, payload, label, currency }: {
 }
 
 /** Área de gasto con degradado y brillo neón. */
-export function SpendArea({ data, currency, color = "#ff2e97", height = 220, cumulative = false, compare }: {
+export function SpendArea({ data, currency, color = "var(--neg)", height = 220, cumulative = false, compare }: {
   data: SeriesPoint[]; currency: string; color?: string; height?: number; cumulative?: boolean; compare?: boolean;
 }) {
   const uid = useId().replace(/:/g, "");
@@ -49,20 +38,19 @@ export function SpendArea({ data, currency, color = "#ff2e97", height = 220, cum
         <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id={`g${uid}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity={0.45} />
-              <stop offset="100%" stopColor={color} stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: color }} stopOpacity={0.45} />
+              <stop offset="100%" style={{ stopColor: color }} stopOpacity={0} />
             </linearGradient>
-            <Glow id={`f${uid}`} color={color} />
           </defs>
           <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="2 6" />
           <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={false} minTickGap={24} interval="preserveStartEnd" />
           <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} tickFormatter={(v) => formatCompact(v, currency)} />
-          <Tooltip content={<Tip currency={currency} />} cursor={{ stroke: color, strokeOpacity: 0.4, strokeDasharray: "3 3" }} />
-          {compare && <Area dataKey="income" type="monotone" stroke="#00ff9d" strokeWidth={1.5} fill="none" dot={false} />}
+          <Tooltip content={<Tip currency={currency} />} cursor={{ stroke: color, strokeOpacity: 0.5, strokeDasharray: "3 3" }} />
+          {compare && <Area dataKey="income" type="monotone" stroke="var(--pos)" strokeWidth={1.5} fill="none" dot={false} />}
           <Area dataKey={key} type="monotone" stroke="none" fill={`url(#g${uid})`} dot={false} activeDot={false} isAnimationActive={false} tooltipType="none" />
           <Area
             dataKey={key} type="monotone" stroke={color} strokeWidth={2.4} fill="none"
-            filter={`url(#f${uid})`} dot={false} activeDot={{ r: 5, stroke: "var(--bg)", strokeWidth: 2 }}
+            dot={false} activeDot={{ r: 5, stroke: "var(--bg)", strokeWidth: 2 }}
             isAnimationActive animationDuration={700}
           />
         </AreaChart>
@@ -75,18 +63,16 @@ export function SpendArea({ data, currency, color = "#ff2e97", height = 220, cum
 export function CategoryDonut({ data, currency, centerLabel, centerValue, size = 190 }: {
   data: CategorySlice[]; currency: string; centerLabel: string; centerValue: string; size?: number;
 }) {
-  const uid = useId().replace(/:/g, "");
   return (
     <div className="relative mx-auto" style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <PieChart>
-          <defs><Glow id={`d${uid}`} color="#ffffff" /></defs>
           <Pie
             data={data} dataKey="value" nameKey="name" innerRadius="68%" outerRadius="94%"
             paddingAngle={data.length > 1 ? 3 : 0} cornerRadius={5} stroke="none" startAngle={90} endAngle={-270}
             isAnimationActive animationDuration={700}
           >
-            {data.map((d) => <Cell key={d.id} fill={d.color} style={{ filter: `drop-shadow(0 0 6px ${d.color}99)` }} />)}
+            {data.map((d) => <Cell key={d.id} fill={d.color} />)}
           </Pie>
           <Tooltip content={<Tip currency={currency} />} />
         </PieChart>
@@ -101,7 +87,7 @@ export function CategoryDonut({ data, currency, centerLabel, centerValue, size =
   );
 }
 
-export function WeekdayBars({ data, currency, color = "#22d3ee" }: {
+export function WeekdayBars({ data, currency, color = "var(--cyan)" }: {
   data: { label: string; avg: number }[]; currency: string; color?: string;
 }) {
   const max = Math.max(...data.map((d) => d.avg));
@@ -113,8 +99,7 @@ export function WeekdayBars({ data, currency, color = "#22d3ee" }: {
           <Tooltip content={<Tip currency={currency} />} cursor={{ fill: "var(--surface-2)" }} />
           <Bar dataKey="avg" radius={[6, 6, 2, 2]} isAnimationActive animationDuration={600}>
             {data.map((d) => (
-              <Cell key={d.label} fill={color} fillOpacity={d.avg === max ? 1 : 0.4}
-                style={d.avg === max ? { filter: `drop-shadow(0 0 8px ${color})` } : undefined} />
+              <Cell key={d.label} fill={color} fillOpacity={d.avg === max ? 1 : 0.4} />
             ))}
           </Bar>
         </BarChart>
@@ -132,7 +117,7 @@ export function Sparkline({ values, color, height = 36 }: { values: number[]; co
         <AreaChart data={data} margin={{ top: 3, right: 0, left: 0, bottom: 3 }}>
           <defs>
             <linearGradient id={`s${uid}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity={0.35} /><stop offset="100%" stopColor={color} stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: color }} stopOpacity={0.35} /><stop offset="100%" style={{ stopColor: color }} stopOpacity={0} />
             </linearGradient>
           </defs>
           <Area dataKey="v" type="monotone" stroke={color} strokeWidth={1.8} fill={`url(#s${uid})`} dot={false} isAnimationActive={false} />
@@ -149,7 +134,7 @@ export function BudgetBar({ ratio, color }: { ratio: number; color: string }) {
   return (
     <div className="h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuenow={Math.round(ratio * 100)} aria-valuemin={0} aria-valuemax={100}>
       <div className="h-full rounded-full transition-[width] duration-700"
-        style={{ width: `${Math.min(ratio, 1) * 100}%`, background: c, boxShadow: `0 0 10px ${c}` }} />
+        style={{ width: `${Math.min(ratio, 1) * 100}%`, background: c }} />
     </div>
   );
 }

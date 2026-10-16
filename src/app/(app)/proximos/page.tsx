@@ -44,9 +44,8 @@ export default function Proximos() {
         right={<Button size="md" onClick={() => open({ status: "planned" })}><Plus className="size-4" /> Programar</Button>} />
 
       <Card className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-amber/20 blur-3xl" />
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Comprometido · 30 días</p>
-        <p className="num mt-1 text-3xl font-semibold text-amber glow-text">{formatMoney(total30, cur)}</p>
+        <p className="num mt-1 text-3xl font-semibold text-amber">{formatMoney(total30, cur)}</p>
       </Card>
 
       {!ready ? <Skeleton className="h-48" /> : groups.length === 0 ? (

@@ -7,6 +7,7 @@ import { BudgetBar, CategoryDonut, SpendArea } from "@/components/charts/charts"
 import { CategoryIcon } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { PeriodChips } from "@/components/period-chips";
+import { HScroll } from "@/components/ui/hscroll";
 import { useQuickAdd } from "@/components/transactions/quick-add";
 import { TxRow } from "@/components/transactions/tx-row";
 import { Card, SectionTitle } from "@/components/ui/card";
@@ -48,7 +49,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       <PageHeader title={greeting} sub="Tu panel de gastos" />
-      <div className="-mx-4 overflow-x-auto px-4 no-scrollbar"><PeriodChips value={period} onChange={setPeriod} /></div>
+      <HScroll className="-mx-4 px-4"><PeriodChips value={period} onChange={setPeriod} /></HScroll>
 
       {/* Acciones rápidas */}
       <div className="grid grid-cols-2 gap-2.5">
@@ -64,7 +65,6 @@ export default function Dashboard() {
 
       {/* Ticker principal */}
       <Card className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-neg/20 blur-3xl" />
         <div className="relative">
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
             <span className="pulse-dot size-1.5 rounded-full bg-neg" /> Gasto · {period}
@@ -96,7 +96,7 @@ export default function Dashboard() {
             <ul className="w-full flex-1 space-y-2.5">
               {d.slices.slice(0, 5).map((s) => (
                 <li key={s.id} className="flex items-center gap-3">
-                  <span className="size-2.5 shrink-0 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />
+                  <span className="size-2.5 shrink-0 rounded-full" style={{ background: s.color }} />
                   <span className="min-w-0 flex-1 truncate text-sm">{s.name}</span>
                   <span className="num text-xs text-muted">{s.pct.toFixed(0)}%</span>
                   <span className="num w-24 text-right text-sm font-medium">{formatCompact(s.value, cur)}</span>

@@ -85,7 +85,7 @@ function CatForm({ initial, onClose }: { initial: Partial<Category>; onClose: ()
           {NEON_COLORS.map((c) => (
             <button key={c} onClick={() => setColor(c)} aria-label={`Color ${c}`} aria-pressed={color === c}
               className={cn("size-10 rounded-full ring-offset-2 ring-offset-surface transition", color === c && "ring-2")}
-              style={{ background: c, boxShadow: `0 0 12px ${c}88`, ["--tw-ring-color" as string]: c }} />
+              style={{ background: c, ["--tw-ring-color" as string]: c }} />
           ))}
         </div>
       </div>

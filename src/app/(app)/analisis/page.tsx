@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { CategoryDonut, SpendArea, WeekdayBars } from "@/components/charts/charts";
 import { PageHeader } from "@/components/page-header";
 import { PeriodChips } from "@/components/period-chips";
+import { HScroll } from "@/components/ui/hscroll";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Delta, EmptyState, Skeleton } from "@/components/ui/misc";
@@ -44,17 +45,17 @@ export default function Analisis() {
   return (
     <div className="space-y-4">
       <PageHeader title="Análisis" sub="Entiende en qué se va tu dinero" />
-      <div className="-mx-4 overflow-x-auto px-4 no-scrollbar"><PeriodChips value={period} onChange={setPeriod} /></div>
+      <HScroll className="-mx-4 px-4"><PeriodChips value={period} onChange={setPeriod} /></HScroll>
 
       <div className="grid grid-cols-2 gap-2.5">
         <Card className="p-3.5">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Gastado</p>
-          <p className="num mt-1 text-xl font-semibold text-neg glow-text">{formatCompact(a.now.expense, cur)}</p>
+          <p className="num mt-1 text-xl font-semibold text-neg">{formatCompact(a.now.expense, cur)}</p>
           <Delta value={delta(a.now.expense, a.before.expense)} invert />
         </Card>
         <Card className="p-3.5">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Tasa de ahorro</p>
-          <p className="num mt-1 text-xl font-semibold text-pos glow-text">{a.rate === null ? "—" : `${a.rate.toFixed(0)}%`}</p>
+          <p className="num mt-1 text-xl font-semibold text-pos">{a.rate === null ? "—" : `${a.rate.toFixed(0)}%`}</p>
           <span className="num text-xs text-muted">Balance {formatCompact(a.now.net, cur)}</span>
         </Card>
       </div>
@@ -66,7 +67,7 @@ export default function Analisis() {
             <Chip active={mode === "cumulative"} onClick={() => setMode("cumulative")} className="h-8 px-2.5">Acumulado</Chip>
           </div>
         }>Evolución</SectionTitle>
-        <SpendArea data={a.data} currency={cur} cumulative={mode === "cumulative"} height={230} color={mode === "daily" ? "#ff2e97" : "#22d3ee"} compare={mode === "daily"} />
+        <SpendArea data={a.data} currency={cur} cumulative={mode === "cumulative"} height={230} color={mode === "daily" ? "var(--neg)" : "var(--cyan)"} compare={mode === "daily"} />
         <div className="num mt-2 flex gap-4 text-[11px] text-muted">
           <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-neg" /> Gasto</span>
           {mode === "daily" && <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-pos" /> Ingreso</span>}
@@ -81,7 +82,7 @@ export default function Analisis() {
             <ul className="mt-5 space-y-3">
               {a.movers.map((s) => (
                 <li key={s.id} className="flex items-center gap-3">
-                  <span className="size-2.5 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />
+                  <span className="size-2.5 rounded-full" style={{ background: s.color }} />
                   <span className="min-w-0 flex-1 truncate text-sm">{s.name}</span>
                   <Delta value={s.change} invert className="w-16 justify-end" />
                   <span className="num w-20 text-right text-sm font-medium">{formatCompact(s.value, cur)}</span>
