@@ -7,6 +7,8 @@ import { BudgetBar } from "@/components/charts/charts";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { budgetAlerts } from "@/lib/budget";
 import { buildInsights, type Insight, type InsightIcon } from "@/lib/insights";
+import { PERIOD_LABEL, detectSubscriptions } from "@/lib/subscriptions";
+import { relativeDay } from "@/lib/dates";
 import { formatCompact, formatMoney } from "@/lib/money";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -93,6 +95,34 @@ export function BudgetAlertsCard({ className }: { className?: string }) {
             </li>
           ))}
         </ul>
+      )}
+    </Card>
+  );
+}
+
+export function SubscriptionsCard({ className }: { className?: string }) {
+  const { transactions, settings } = useStore();
+  const cur = settings.currency;
+  const subs = useMemo(() => detectSubscriptions(transactions), [transactions]);
+  const monthly = subs.reduce((a, s) => a + s.monthlyCost, 0);
+  return (
+    <Card className={cn("rounded-[36px]", className)}>
+      <SectionTitle action={<Link href="/suscripciones" className="text-sm font-semibold text-ink/70">Ver →</Link>}>Suscripciones</SectionTitle>
+      {subs.length === 0 ? <p className="text-sm text-muted">Aún no detectamos pagos recurrentes.</p> : (
+        <>
+          <p className="num text-2xl font-semibold">{formatMoney(monthly, settings.currency)}<span className="ml-1.5 text-xs font-medium text-muted">/ mes</span></p>
+          <ul className="mt-3 space-y-2.5">
+            {subs.slice(0, 4).map((s) => (
+              <li key={s.key} className="flex items-center justify-between gap-3 text-sm">
+                <span className="min-w-0">
+                  <span className="block truncate font-medium first-letter:uppercase">{s.name}</span>
+                  <span className="block text-xs text-muted">{PERIOD_LABEL[s.period]}{s.next ? ` · ${relativeDay(s.next)}` : ""}</span>
+                </span>
+                <span className="num shrink-0 font-semibold">{formatCompact(s.monthlyCost, cur)}</span>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </Card>
   );

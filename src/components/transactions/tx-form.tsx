@@ -37,8 +37,8 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
   const [raw, setRaw] = useState(editing ? String(toMajor(editing.amount, cur)) : "");
   const [categoryId, setCategoryId] = useState<string | null>(editing?.categoryId ?? null);
   const [note, setNote] = useState(editing?.note ?? "");
-  const [date, setDate] = useState(editing?.date ?? addDaysISO(today(), opts.status === "planned" ? 1 : 0));
-  const [status, setStatus] = useState<TxStatus>(editing?.status ?? opts.status ?? "paid");
+  const [date, setDate] = useState(editing?.date ?? opts.date ?? addDaysISO(today(), opts.status === "planned" ? 1 : 0));
+  const [status, setStatus] = useState<TxStatus>(editing?.status ?? opts.status ?? (opts.date && opts.date > today() ? "planned" : "paid"));
   const [rec, setRec] = useState<Recurrence>(editing?.recurrence ?? null);
 
   const [creating, setCreating] = useState(false);

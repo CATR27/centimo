@@ -14,7 +14,7 @@ import { Delta, EmptyState, Skeleton } from "@/components/ui/misc";
 import { budgetStatus, byCategory, delta, series, totals, upcoming } from "@/lib/analytics";
 import { periodRanges, relativeDay, today, type Period } from "@/lib/dates";
 import { formatCompact, formatMoney } from "@/lib/money";
-import { BudgetAlertsCard, InsightsCard } from "@/components/widgets";
+import { BudgetAlertsCard, InsightsCard, SubscriptionsCard } from "@/components/widgets";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -169,6 +169,7 @@ export default function Dashboard() {
         <div className="grid content-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1">
           <InsightsCard />
           <BudgetAlertsCard />
+          <SubscriptionsCard className="lg:col-span-2 xl:col-span-1" />
         </div>
       </div>
 

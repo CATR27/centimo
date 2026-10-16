@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useState, type ReactNode } from
 import type { Transaction, TxStatus, TxType } from "@/lib/types";
 import { TxFormSheet } from "./tx-form";
 
-export interface OpenOpts { tx?: Transaction; type?: TxType; status?: TxStatus }
+export interface OpenOpts { tx?: Transaction; type?: TxType; status?: TxStatus; /** YYYY-MM-DD */ date?: string }
 const Ctx = createContext<(o?: OpenOpts) => void>(() => {});
 export const useQuickAdd = () => useContext(Ctx);
 

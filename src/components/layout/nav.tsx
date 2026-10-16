@@ -21,7 +21,7 @@ export function TopBar() {
   const { settings, demo } = useStore();
   const isActive = useActive();
   return (
-    <header className="pt-safe sticky top-0 z-30 bg-panel/90 backdrop-blur-xl lg:hidden">
+    <header className="pt-safe sticky top-0 z-30 bg-panel/90 backdrop-blur-xl print:hidden lg:hidden">
       <div className="mx-auto flex h-16 max-w-2xl items-center gap-2 px-4">
         <Link href="/dashboard" aria-label="Inicio" className="mr-auto"><Logo /></Link>
         {demo && <span className="rounded-full bg-lime px-3 py-1.5 text-[10px] font-bold tracking-wider text-lime-ink">DEMO</span>}
@@ -50,7 +50,7 @@ export function Dock() {
   const isActive = useActive();
   const slots = [DOCK[0], DOCK[1], null, DOCK[2], DOCK[3]];
   return (
-    <nav aria-label="Principal" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] lg:hidden">
+    <nav aria-label="Principal" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] print:hidden lg:hidden">
       <div className="dock pointer-events-auto mx-auto grid max-w-md grid-cols-5 place-items-center rounded-full bg-surface p-2">
         {slots.map((n, idx) => n ? (
           <DockItem key={n.href} item={n} on={isActive(n.href)} />
@@ -89,7 +89,7 @@ export function Rail() {
   return (
     <aside
       aria-label="Menú principal"
-      className="group/rail fixed inset-y-0 left-0 z-40 hidden w-[80px] flex-col overflow-hidden bg-panel py-5 transition-[width,box-shadow] duration-200 ease-out hover:w-[256px] hover:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] focus-within:w-[256px] focus-within:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] lg:flex"
+      className="group/rail fixed inset-y-0 left-0 z-40 hidden w-[80px] print:!hidden flex-col overflow-hidden bg-panel py-5 transition-[width,box-shadow] duration-200 ease-out hover:w-[256px] hover:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] focus-within:w-[256px] focus-within:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] lg:flex"
     >
       <div className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-[17px] no-scrollbar">
         <Link href="/dashboard" aria-label="Inicio" className={cn(RAIL_ITEM, "mb-3 h-12")}>

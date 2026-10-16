@@ -11,6 +11,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard", label: "Panel", icon: "panel", hint: "Resumen del periodo" },
       { href: "/transacciones", label: "Historial", icon: "historial", hint: "Todos los movimientos" },
       { href: "/proximos", label: "Próximos", icon: "proximos", hint: "Pagos programados" },
+      { href: "/calendario", label: "Calendario", icon: "calendario", hint: "Tu mes día a día" },
       { href: "/hub", label: "Hub", icon: "hub", hint: "Todo en un lugar" },
     ],
   },
@@ -18,6 +19,8 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Análisis",
     items: [
       { href: "/analisis", label: "Análisis", icon: "analisis", hint: "Gráficas y patrones" },
+      { href: "/suscripciones", label: "Suscripciones", icon: "suscripciones", hint: "Pagos recurrentes" },
+      { href: "/reporte", label: "Reporte", icon: "reporte", hint: "Resumen mensual" },
     ],
   },
   {

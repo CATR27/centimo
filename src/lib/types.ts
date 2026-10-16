@@ -23,6 +23,8 @@ export interface Transaction {
   date: string;
   status: TxStatus;
   recurrence: Recurrence;
+  /** par de movimientos de una transferencia entre cuentas (se excluye de los análisis) */
+  transferId?: string | null;
 }
 
 export interface Settings {
