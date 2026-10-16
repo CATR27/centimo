@@ -12,6 +12,22 @@ export interface Category {
   monthlyBudget: number | null;
 }
 
+export type AccountType = "cash" | "bank" | "card" | "savings";
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  color: string;
+  /** saldo inicial en unidades menores */
+  openingBalance: number;
+}
+
+export const ACCOUNT_TYPES: { v: AccountType; label: string }[] = [
+  { v: "cash", label: "Efectivo" }, { v: "bank", label: "Banco" },
+  { v: "card", label: "Tarjeta" }, { v: "savings", label: "Ahorros" },
+];
+
 export interface Transaction {
   id: string;
   categoryId: string | null;
@@ -23,14 +39,23 @@ export interface Transaction {
   date: string;
   status: TxStatus;
   recurrence: Recurrence;
+  /** cuenta a la que pertenece (null = cuenta por defecto) */
+  accountId?: string | null;
+  /** etiquetas libres, en minúsculas y sin # */
+  tags?: string[];
+  /** par de movimientos de una transferencia entre cuentas (se excluye de los análisis) */
+  transferId?: string | null;
 }
 
 export interface Settings {
   currency: string;
   displayName: string;
+  /** presupuesto global mensual en unidades menores (null = sin límite) */
+  monthlyBudget: number | null;
 }
 
 export interface Snapshot {
+  accounts: Account[];
   categories: Category[];
   transactions: Transaction[];
   settings: Settings;

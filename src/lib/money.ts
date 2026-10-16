@@ -42,8 +42,15 @@ export const toMajor = (minor: number, code: string) => minor / 10 ** currencyIn
 export const toMinor = (major: number, code: string) =>
   Math.round(major * 10 ** currencyInfo(code).decimals);
 
-export const formatMoney = (minor: number, code: string) => fmt(code, false).format(toMajor(minor, code));
-export const formatCompact = (minor: number, code: string) => fmt(code, true).format(toMajor(minor, code));
+/** Modo privado: oculta todos los montos. Lo activa el StoreProvider antes de renderizar. */
+let privacyOn = false;
+export const setPrivacy = (on: boolean) => { privacyOn = on; };
+const MASK = "••••";
+
+export const formatMoney = (minor: number, code: string) =>
+  privacyOn ? MASK : fmt(code, false).format(toMajor(minor, code));
+export const formatCompact = (minor: number, code: string) =>
+  privacyOn ? MASK : fmt(code, true).format(toMajor(minor, code));
 
 export const currencySymbol = (code: string) =>
   fmt(code, false).formatToParts(0).find((p) => p.type === "currency")?.value ?? code;

@@ -34,10 +34,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 function Frame({ children }: { children: ReactNode }) {
   usePathname(); // re-render del layout al navegar
   return (
-    <div className="min-h-dvh lg:pl-[104px]">
+    <div className="min-h-dvh lg:pl-[80px] print:pl-0">
       <Rail />
       <TopBar />
-      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 lg:max-w-6xl lg:px-10 lg:pb-12 lg:pt-10">
+      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 lg:max-w-[1400px] lg:px-8 lg:pb-12 lg:pt-10 print:max-w-none print:p-0">
         {children}
       </main>
       <Dock />

@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import { localRepo } from "./data/local-repo";
 import { supabaseRepo } from "./data/supabase-repo";
 import type { Repo } from "./data/repo";
+import { newlyCrossed } from "./budget";
+import { formatMoney, setPrivacy } from "./money";
 import { isDemo } from "./supabase/env";
 import { nextOccurrence } from "./dates";
 import { uid } from "./utils";
-import type { Category, Settings, Snapshot, Transaction } from "./types";
+import type { Account, Category, Settings, Snapshot, Transaction } from "./types";
 
 interface Store extends Snapshot {
   ready: boolean;
@@ -18,19 +20,30 @@ interface Store extends Snapshot {
   removeTx: (id: string) => void;
   /** Marca un próximo como pagado; si es recurrente, programa el siguiente. */
   markPaid: (id: string) => void;
+  /** Guarda muchos movimientos de una vez (importación CSV). Devuelve cuántos se guardaron. */
+  addMany: (txs: Omit<Transaction, "id">[]) => number;
+  /** Mueve dinero entre cuentas creando un par de movimientos enlazados. */
+  addTransfer: (t: { fromId: string; toId: string; amount: number; date: string; note?: string }) => void;
+  saveAccount: (a: Omit<Account, "id"> & { id?: string }) => void;
+  removeAccount: (id: string) => void;
   saveCategory: (c: Omit<Category, "id"> & { id?: string }) => void;
   removeCategory: (id: string) => void;
   updateSettings: (s: Partial<Settings>) => void;
   reload: () => void;
+  /** Modo privado: oculta los montos en toda la app. */
+  privacy: boolean;
+  togglePrivacy: () => void;
 }
 
-const EMPTY: Snapshot = { categories: [], transactions: [], settings: { currency: "COP", displayName: "" } };
+const EMPTY: Snapshot = { accounts: [], categories: [], transactions: [], settings: { currency: "COP", displayName: "", monthlyBudget: null } };
 const Ctx = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const repo: Repo = isDemo ? localRepo : supabaseRepo;
   const [snap, setSnap] = useState<Snapshot>(EMPTY);
   const [ready, setReady] = useState(false);
+  const [privacy, setPrivacyState] = useState(false);
+  setPrivacy(privacy); // antes de renderizar a los hijos
   const snapRef = useRef(snap);
   snapRef.current = snap;
 
@@ -40,6 +53,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [repo]);
 
   useEffect(reload, [reload]);
+  useEffect(() => {
+    try { setPrivacyState(localStorage.getItem("centimo:privacy") === "1"); } catch {}
+  }, []);
+  const togglePrivacy = useCallback(() => {
+    setPrivacyState((v) => {
+      try { localStorage.setItem("centimo:privacy", v ? "0" : "1"); } catch {}
+      return !v;
+    });
+  }, []);
 
   /** Aplica el cambio local al instante y revierte si el servidor falla. */
   const mutate = useCallback((next: (s: Snapshot) => Snapshot, persist: () => Promise<void>) => {
@@ -56,9 +78,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       list.some((x) => x.id === item.id) ? list.map((x) => (x.id === item.id ? item : x)) : [item, ...list];
 
     return {
-      ...snap, ready, demo: isDemo, reload,
+      ...snap, ready, demo: isDemo, reload, privacy, togglePrivacy,
       addTx: (t) => {
         const tx: Transaction = { ...t, id: t.id ?? uid() };
+        const before = snapRef.current;
+        if (tx.type === "expense" && tx.status === "paid") {
+          for (const a of newlyCrossed(before, upsert(before.transactions, tx))) {
+            const msg = `${a.name}: ${Math.round(a.ratio * 100)}% (${formatMoney(a.spent, before.settings.currency)} de ${formatMoney(a.budget, before.settings.currency)})`;
+            if (a.level === "over") toast.error("Presupuesto superado", { description: msg });
+            else toast.warning("Cerca del límite de presupuesto", { description: msg });
+          }
+        }
         mutate((s) => ({ ...s, transactions: upsert(s.transactions, tx) }), () => repo.saveTx(tx));
       },
       updateTx: (tx) => mutate((s) => ({ ...s, transactions: upsert(s.transactions, tx) }), () => repo.saveTx(tx)),
@@ -75,6 +105,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           async () => { await repo.saveTx(paidTx); if (follow) await repo.saveTx(follow); },
         );
         toast.success("Marcado como pagado");
+      },
+      addMany: (list) => {
+        const txs: Transaction[] = list.map((t) => ({ ...t, id: uid() }));
+        if (!txs.length) return 0;
+        mutate((s) => ({ ...s, transactions: [...txs, ...s.transactions] }), () => repo.saveTxs(txs));
+        return txs.length;
+      },
+      addTransfer: ({ fromId, toId, amount, date, note }) => {
+        const accounts = snapRef.current.accounts;
+        const from = accounts.find((a) => a.id === fromId);
+        const to = accounts.find((a) => a.id === toId);
+        if (!from || !to || fromId === toId || amount <= 0) return;
+        const transferId = uid();
+        const base = { categoryId: null, amount, date, status: "paid" as const, recurrence: null, tags: [], transferId };
+        const out: Transaction = { ...base, id: uid(), type: "expense", accountId: fromId, note: note || `Transferencia a ${to.name}` };
+        const inn: Transaction = { ...base, id: uid(), type: "income", accountId: toId, note: note || `Transferencia desde ${from.name}` };
+        mutate((s) => ({ ...s, transactions: [out, inn, ...s.transactions] }), () => repo.saveTxs([out, inn]));
+        toast.success("Transferencia registrada");
+      },
+      saveAccount: (a) => {
+        const acc: Account = { ...a, id: a.id ?? uid() };
+        mutate((s) => ({ ...s, accounts: upsert(s.accounts, acc) }), () => repo.saveAccount(acc));
+      },
+      removeAccount: (id) => {
+        if (snapRef.current.accounts.length <= 1) { toast.error("Debes conservar al menos una cuenta"); return; }
+        mutate(
+          (s) => ({
+            ...s,
+            accounts: s.accounts.filter((a) => a.id !== id),
+            transactions: s.transactions.map((t) => (t.accountId === id ? { ...t, accountId: null } : t)),
+          }),
+          () => repo.deleteAccount(id),
+        );
       },
       saveCategory: (c) => {
         const cat: Category = { ...c, id: c.id ?? uid() };
@@ -94,7 +157,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         mutate((s) => ({ ...s, settings }), () => repo.saveSettings(settings));
       },
     };
-  }, [snap, ready, mutate, repo, reload]);
+  }, [snap, ready, mutate, repo, reload, privacy, togglePrivacy]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

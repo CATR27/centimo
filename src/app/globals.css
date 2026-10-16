@@ -155,6 +155,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 @keyframes ai-draw { 0% { stroke-dashoffset: 30; } 100% { stroke-dashoffset: 0; } }
 @keyframes ai-slide { 0% { transform: translateX(var(--dx, -5px)); } 100% { transform: translateX(0); } }
 @keyframes ai-swing { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-18deg); } 60% { transform: rotate(10deg); } }
+@keyframes ai-drop { 0% { transform: translateY(-6px); opacity: .2; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes ai-spin { 0% { transform: rotate(-90deg) scale(.7); } 100% { transform: rotate(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .ai-play * { animation: none !important; } }
 
@@ -167,3 +168,10 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 @keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 .caret { animation: caret 1s steps(1) infinite; }
 @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+
+@media print {
+  body::before { display: none; }
+  html, body { background: #fff !important; }
+  :root, .dark { --bg: #fff; --surface: #fff; --surface-2: #f3f5f4; --text: #0a0d0c; --muted: #5d6865; --border: #d8dedc; color-scheme: light; }
+  [data-sonner-toaster] { display: none; }
+}

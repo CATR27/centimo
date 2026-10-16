@@ -14,6 +14,7 @@ import { Delta, EmptyState, Skeleton } from "@/components/ui/misc";
 import { budgetStatus, byCategory, delta, series, totals, upcoming } from "@/lib/analytics";
 import { periodRanges, relativeDay, today, type Period } from "@/lib/dates";
 import { formatCompact, formatMoney } from "@/lib/money";
+import { BudgetAlertsCard, InsightsCard, SubscriptionsCard } from "@/components/widgets";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +56,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.9fr)_minmax(0,0.85fr)]">
         {/* ── Tarjeta principal (panel salvia) ── */}
         <section className="rounded-[40px] bg-panel p-4 sm:p-6" aria-label="Resumen">
           <div className="flex flex-col items-center text-center">
@@ -164,6 +165,12 @@ export default function Dashboard() {
             Ver todo →
           </Link>
         </Card>
+        {/* ── Columna de widgets: hallazgos y alertas ── */}
+        <div className="grid content-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1">
+          <InsightsCard />
+          <BudgetAlertsCard />
+          <SubscriptionsCard className="lg:col-span-2 xl:col-span-1" />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

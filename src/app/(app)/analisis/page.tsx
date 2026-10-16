@@ -1,17 +1,17 @@
 "use client";
 
-import { Flame, TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CategoryDonut, SpendArea, WeekdayBars } from "@/components/charts/charts";
 import { PageHeader } from "@/components/page-header";
 import { PeriodChips } from "@/components/period-chips";
+import { InsightsCard } from "@/components/widgets";
 import { HScroll } from "@/components/ui/hscroll";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Delta, EmptyState, Skeleton } from "@/components/ui/misc";
 import { byCategory, delta, series, totals, weekdayPattern } from "@/lib/analytics";
 import { periodRanges, type Period } from "@/lib/dates";
-import { formatCompact, formatMoney } from "@/lib/money";
+import { formatCompact } from "@/lib/money";
 import { useStore } from "@/lib/store";
 
 export default function Analisis() {
@@ -39,15 +39,14 @@ export default function Analisis() {
 
   if (!ready) return <div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-72" /><Skeleton className="h-64" /></div>;
 
-  const peak = [...a.week].sort((x, y) => y.avg - x.avg)[0];
-  const top = a.slices[0];
-
   return (
-    <div className="space-y-4">
-      <PageHeader title="Análisis" sub="Entiende en qué se va tu dinero" />
-      <HScroll className="-mx-4 px-4"><PeriodChips value={period} onChange={setPeriod} /></HScroll>
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="lg:col-span-2">
+        <PageHeader title="Análisis" sub="Entiende en qué se va tu dinero" />
+        <HScroll className="-mx-4 px-4"><PeriodChips value={period} onChange={setPeriod} /></HScroll>
+      </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5 lg:col-span-2 lg:grid-cols-4">
         <Card className="p-3.5">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Gastado</p>
           <p className="num mt-1 text-xl font-semibold text-neg">{formatCompact(a.now.expense, cur)}</p>
@@ -98,31 +97,8 @@ export default function Analisis() {
         <WeekdayBars data={a.week} currency={cur} />
       </Card>
 
-      {top && peak && (
-        <Card className="space-y-3">
-          <SectionTitle>Insights</SectionTitle>
-          <Insight Icon={Flame} color="text-amber">
-            <b>{top.name}</b> concentra el {top.pct.toFixed(0)}% de tu gasto ({formatMoney(top.value, cur)}).
-          </Insight>
-          <Insight Icon={peak.avg > 0 ? TrendingUp : TrendingDown} color="text-cyan">
-            Gastas más los <b>{peak.label}</b>: en promedio {formatMoney(Math.round(peak.avg), cur)}.
-          </Insight>
-          {a.biggest[0] && (
-            <Insight Icon={TrendingUp} color="text-neg">
-              Mayor gasto: <b>{a.biggest[0].note || "Sin nota"}</b> por {formatMoney(a.biggest[0].amount, cur)}.
-            </Insight>
-          )}
-        </Card>
-      )}
+      <InsightsCard limit={6} className="lg:col-span-2" />
     </div>
   );
 }
 
-function Insight({ Icon, color, children }: { Icon: typeof Flame; color: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-3 text-sm">
-      <Icon className={`mt-0.5 size-4 shrink-0 ${color}`} />
-      <p className="text-muted [&_b]:font-semibold [&_b]:text-ink">{children}</p>
-    </div>
-  );
-}

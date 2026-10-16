@@ -50,7 +50,8 @@ export default function Proximos() {
 
       {!ready ? <Skeleton className="h-48" /> : groups.length === 0 ? (
         <EmptyState title="No hay pagos programados" hint="Programa arriendo, suscripciones o cuotas." />
-      ) : groups.map((g) => (
+      ) : (
+        <div className="grid items-start gap-5 lg:grid-cols-2">{groups.map((g) => (
         <section key={g.title}>
           <div className="mb-1 flex items-center justify-between px-1">
             <h2 className={cn("text-[11px] font-semibold uppercase tracking-[0.14em]", g.tone)}>{g.title}</h2>
@@ -65,7 +66,7 @@ export default function Proximos() {
             ))}
           </div>
         </section>
-      ))}
+      ))}</div>)}
     </div>
   );
 }

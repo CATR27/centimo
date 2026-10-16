@@ -7,6 +7,7 @@ import { HScroll } from "@/components/ui/hscroll";
 import { Sheet } from "@/components/ui/sheet";
 import { addDaysISO, today } from "@/lib/dates";
 import { currencyInfo, currencySymbol, toMajor, toMinor } from "@/lib/money";
+import { parseTags } from "@/lib/accounts";
 import { useStore } from "@/lib/store";
 import { NEON_COLORS, type Recurrence, type Transaction, type TxStatus, type TxType } from "@/lib/types";
 import { cn, uid } from "@/lib/utils";
@@ -28,7 +29,7 @@ export function TxFormSheet({ open, opts, onClose }: { open: boolean; opts: Open
 }
 
 function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
-  const { categories, settings, addTx, updateTx, removeTx, saveCategory } = useStore();
+  const { categories, accounts, settings, addTx, updateTx, removeTx, saveCategory } = useStore();
   const cur = settings.currency;
   const decimals = currencyInfo(cur).decimals;
   const editing = opts.tx;
@@ -37,9 +38,12 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
   const [raw, setRaw] = useState(editing ? String(toMajor(editing.amount, cur)) : "");
   const [categoryId, setCategoryId] = useState<string | null>(editing?.categoryId ?? null);
   const [note, setNote] = useState(editing?.note ?? "");
-  const [date, setDate] = useState(editing?.date ?? addDaysISO(today(), opts.status === "planned" ? 1 : 0));
-  const [status, setStatus] = useState<TxStatus>(editing?.status ?? opts.status ?? "paid");
+  const [date, setDate] = useState(editing?.date ?? opts.date ?? addDaysISO(today(), opts.status === "planned" ? 1 : 0));
+  const [status, setStatus] = useState<TxStatus>(editing?.status ?? opts.status ?? (opts.date && opts.date > today() ? "planned" : "paid"));
   const [rec, setRec] = useState<Recurrence>(editing?.recurrence ?? null);
+
+  const [accountId, setAccountId] = useState<string | null>(editing?.accountId ?? accounts[0]?.id ?? null);
+  const [tagsText, setTagsText] = useState((editing?.tags ?? []).map((t) => `#${t}`).join(" "));
 
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -79,7 +83,10 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
 
   function submit() {
     if (!valid) return;
-    const base = { categoryId, amount, type, note: note.trim(), date, status, recurrence: status === "planned" || rec ? rec : null };
+    const base = {
+      categoryId, amount, type, note: note.trim(), date, status, recurrence: status === "planned" || rec ? rec : null,
+      accountId, tags: parseTags(tagsText),
+    };
     if (editing) updateTx({ ...editing, ...base } as Transaction);
     else addTx(base);
     onClose();
@@ -207,8 +214,31 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
         ))}
       </div>
 
+      {accounts.length > 0 && (
+        <div role="radiogroup" aria-label="Cuenta">
+          <span className="mb-1 block px-1 text-xs text-muted">Cuenta</span>
+          <HScroll className="flex gap-2">
+            {accounts.map((a) => {
+              const on = accountId === a.id;
+              return (
+                <button key={a.id} role="radio" aria-checked={on} onClick={() => setAccountId(a.id)}
+                  className={cn("flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-semibold transition", on ? "bg-accent text-accent-ink" : "bg-surface-2 text-ink/70")}>
+                  <span className="size-2 rounded-full" style={{ background: a.color }} />{a.name}
+                </button>
+              );
+            })}
+          </HScroll>
+        </div>
+      )}
+
       <input
         value={note} onChange={(e) => setNote(e.target.value)} maxLength={80} placeholder="Nota (opcional)"
+        className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
+      />
+
+      <input
+        value={tagsText} onChange={(e) => setTagsText(e.target.value)} maxLength={80} placeholder="Etiquetas: #viaje #trabajo"
+        aria-label="Etiquetas"
         className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
       />
 
