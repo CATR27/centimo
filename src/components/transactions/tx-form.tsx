@@ -2,7 +2,6 @@
 
 import { Check, Delete, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CategoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { HScroll } from "@/components/ui/hscroll";
 import { Sheet } from "@/components/ui/sheet";
@@ -21,7 +20,7 @@ const REC: { v: Recurrence; label: string }[] = [
 
 export function TxFormSheet({ open, opts, onClose }: { open: boolean; opts: OpenOpts; onClose: () => void }) {
   return (
-    <Sheet open={open} onClose={onClose} title={opts.tx ? "Editar movimiento" : "Nuevo movimiento"}>
+    <Sheet open={open} onClose={onClose} title={opts.tx ? "Editar movimiento" : "Nuevo movimiento"} subtitle={opts.tx ? undefined : "· monto"}>
       {/* Se remonta en cada apertura para reiniciar el estado del formulario. */}
       {open && <Form opts={opts} onClose={onClose} />}
     </Sheet>
@@ -74,7 +73,9 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
 
   const amount = toMinor(Number(raw || 0), cur);
   const valid = amount > 0 && !!date;
-  const shown = raw ? Number(raw.replace(/\.$/, "")).toLocaleString("es", { maximumFractionDigits: decimals }) + (raw.endsWith(".") ? "." : "") : "0";
+  const [intPart, fracPart] = raw.split(".");
+  const grouped = (intPart || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const shown = raw ? grouped + (fracPart !== undefined ? "," + fracPart : "") : "0";
 
   function submit() {
     if (!valid) return;
@@ -103,32 +104,50 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const selected = cats.find((c) => c.id === categoryId);
+  const isExp = type === "expense";
+
   return (
-    <div className="space-y-4 pb-2">
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1" role="radiogroup" aria-label="Tipo">
+    <div className="space-y-4 pb-3">
+      {/* Tipo */}
+      <div className="grid grid-cols-2 gap-1 rounded-full bg-surface-2 p-1" role="radiogroup" aria-label="Tipo">
         {(["expense", "income"] as const).map((t) => (
           <button
             key={t} role="radio" aria-checked={type === t} onClick={() => setType(t)}
-            className={cn("h-10 rounded-lg text-sm font-medium transition",
-              type === t ? (t === "expense" ? "bg-neg/15 text-neg" : "bg-pos/15 text-pos") : "text-muted")}
+            className={cn("h-11 rounded-full text-sm font-semibold transition", type === t ? "bg-accent text-accent-ink" : "text-muted")}
           >
             {t === "expense" ? "Gasto" : "Ingreso"}
           </button>
         ))}
       </div>
 
-      <div className="py-1 text-center" aria-live="polite">
-        <div className={cn("num flex items-baseline justify-center gap-1.5 text-5xl font-semibold", type === "expense" ? "text-neg" : "text-pos")}>
-          <span className="text-2xl opacity-70">{currencySymbol(cur)}</span>
-          <span className={cn(!raw && "opacity-30")}>{shown}</span>
+      {/* Tarjeta de monto (degradado) */}
+      <div className="grad-card rounded-[28px] p-5" aria-live="polite">
+        <div className="flex items-center justify-between text-xs">
+          <span className="muted-ink font-medium">{isExp ? "Gastaste" : "Recibiste"}</span>
+          <span className="rounded-full bg-black/10 px-3 py-1 font-semibold">{cur}</span>
+        </div>
+        <div className="num mt-3 flex items-end justify-between gap-3">
+          <div className="flex min-w-0 items-baseline gap-1.5">
+            <span className="text-2xl font-medium opacity-60">{currencySymbol(cur)}</span>
+            <span className={cn("truncate text-[2.75rem] font-semibold leading-none sm:text-5xl", !raw && "opacity-35")}>{shown}</span>
+            <span className="caret mb-1 h-9 w-[2px] shrink-0 bg-black/70" />
+          </div>
+        </div>
+        <div className="mt-4 border-t border-dashed border-black/25 pt-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="muted-ink">Categoría</span>
+            <span className="num text-sm font-semibold">{selected?.name ?? "Sin categoría"}</span>
+          </div>
         </div>
       </div>
 
-      <div className="flex max-h-[7.25rem] flex-wrap gap-2 overflow-y-auto overscroll-contain" role="radiogroup" aria-label="Categoría">
+      {/* Categorías */}
+      <div className="flex max-h-[7.5rem] flex-wrap gap-2 overflow-y-auto overscroll-contain" role="radiogroup" aria-label="Categoría">
         <button
           onClick={() => setCreating((v) => !v)} aria-expanded={creating}
-          className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-dashed px-3 text-sm transition",
-            creating ? "border-accent text-accent" : "border-line text-accent")}
+          className={cn("flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-dashed px-4 text-[13px] font-semibold transition",
+            creating ? "border-ink bg-surface text-ink" : "border-muted/50 text-ink")}
         >
           <Plus className="size-4" /> Nueva
         </button>
@@ -137,28 +156,28 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
           return (
             <button
               key={c.id} role="radio" aria-checked={on} onClick={() => setCategoryId(on ? null : c.id)}
-              className={cn("flex h-11 shrink-0 items-center gap-2 rounded-xl border px-3 text-sm transition", on ? "text-ink" : "border-line text-muted")}
-              style={on ? { borderColor: c.color, background: `color-mix(in srgb, ${c.color} 16%, transparent)` } : undefined}
+              className={cn("flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-semibold transition",
+                on ? "bg-accent text-accent-ink" : "bg-surface-2 text-ink/70")}
             >
-              <CategoryIcon name={c.icon} className="size-4" />
-              <span>{c.name}</span>
+              <span className="size-2 rounded-full" style={{ background: c.color }} />
+              {c.name}
             </button>
           );
         })}
       </div>
 
       {creating && (
-        <div className="space-y-3 rounded-xl border border-line bg-surface-2 p-3">
+        <div className="space-y-3 rounded-[24px] bg-surface p-3">
           <div className="flex gap-2">
             <input
               value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={40} autoFocus
               onKeyDown={(e) => e.key === "Enter" && createCategory()}
-              placeholder={type === "expense" ? "Nombre (ej. Mascotas)" : "Nombre (ej. Ventas)"}
-              className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-base outline-none focus:border-accent"
+              placeholder={isExp ? "Nombre (ej. Mascotas)" : "Nombre (ej. Ventas)"}
+              className="h-11 min-w-0 flex-1 rounded-full bg-surface-2 px-4 text-base outline-none"
             />
             <button
               onClick={createCategory} disabled={!newName.trim()} aria-label="Crear categoría"
-              className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-ink disabled:opacity-40"
+              className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-accent-ink disabled:opacity-40"
             >
               <Check className="size-5" />
             </button>
@@ -167,7 +186,7 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
             {NEON_COLORS.map((c) => (
               <button
                 key={c} role="radio" aria-checked={newColor === c} aria-label={`Color ${c}`} onClick={() => setNewColor(c)}
-                className={cn("size-8 shrink-0 rounded-full ring-offset-2 ring-offset-surface-2 transition", newColor === c && "ring-2")}
+                className={cn("size-8 shrink-0 rounded-full ring-offset-2 ring-offset-surface transition", newColor === c && "ring-2")}
                 style={{ background: c, ["--tw-ring-color" as string]: c }}
               />
             ))}
@@ -175,37 +194,38 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
+      {/* Teclado */}
+      <div className="keypad grid grid-cols-3 gap-y-1 border-t border-line pt-3">
         {KEYS.map((k) => (
           <button
-            key={k} onClick={() => press(k)} aria-label={k === "del" ? "Borrar" : k}
+            key={k} onClick={() => press(k)} aria-label={k === "del" ? "Borrar" : k === "." ? "Coma decimal" : k}
             disabled={k === "." && decimals === 0}
-            className="num grid h-14 place-items-center rounded-xl bg-surface-2 text-2xl font-medium active:scale-95 active:bg-line disabled:opacity-20"
+            className="num grid h-[3.75rem] place-items-center text-[2rem] font-light text-ink/45 hover:text-ink active:text-ink disabled:opacity-20"
           >
-            {k === "del" ? <Delete className="size-6" /> : k}
+            {k === "del" ? <Delete className="size-7" strokeWidth={1.5} /> : k === "." ? "," : k}
           </button>
         ))}
       </div>
 
       <input
         value={note} onChange={(e) => setNote(e.target.value)} maxLength={80} placeholder="Nota (opcional)"
-        className="h-12 w-full rounded-xl border border-line bg-surface-2 px-3.5 text-base outline-none focus:border-accent"
+        className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
       />
 
       <div className="grid grid-cols-2 gap-2">
         <label className="block">
-          <span className="mb-1 block text-xs text-muted">Fecha</span>
+          <span className="mb-1 block px-1 text-xs text-muted">Fecha</span>
           <input
             type="date" value={date} onChange={(e) => setDate(e.target.value)}
-            className="h-12 w-full rounded-xl border border-line bg-surface-2 px-3 text-base outline-none focus:border-accent"
+            className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-3 text-base outline-none focus:ring-2 focus:ring-ink/20"
           />
         </label>
         <div>
-          <span className="mb-1 block text-xs text-muted">Estado</span>
-          <div className="grid h-12 grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
+          <span className="mb-1 block px-1 text-xs text-muted">Estado</span>
+          <div className="grid h-[3.25rem] grid-cols-2 gap-1 rounded-full bg-surface p-1">
             {(["paid", "planned"] as const).map((s) => (
               <button key={s} onClick={() => setStatus(s)} aria-pressed={status === s}
-                className={cn("rounded-lg text-sm font-medium", status === s ? "bg-surface text-accent" : "text-muted")}>
+                className={cn("rounded-full text-sm font-semibold", status === s ? "bg-accent text-accent-ink" : "text-muted")}>
                 {s === "paid" ? "Hecho" : "Próximo"}
               </button>
             ))}
@@ -217,7 +237,7 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
         <HScroll className="flex gap-2" role="radiogroup" aria-label="Repetición">
           {REC.map((r) => (
             <button key={r.label} role="radio" aria-checked={rec === r.v} onClick={() => setRec(r.v)}
-              className={cn("num h-9 shrink-0 rounded-lg border px-3.5 text-xs", rec === r.v ? "border-accent/60 bg-accent/15 text-accent" : "border-line text-muted")}>
+              className={cn("h-10 shrink-0 rounded-full px-4 text-[13px] font-semibold", rec === r.v ? "bg-accent text-accent-ink" : "bg-surface-2 text-muted")}>
               {r.label}
             </button>
           ))}
@@ -226,12 +246,12 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
 
       <div className="flex gap-2 pt-1">
         {editing && (
-          <Button variant="danger" size="icon" aria-label="Eliminar" onClick={() => { removeTx(editing.id); onClose(); }}>
+          <Button variant="danger" size="icon" className="size-14" aria-label="Eliminar" onClick={() => { removeTx(editing.id); onClose(); }}>
             <Trash2 className="size-5" />
           </Button>
         )}
         <Button size="lg" className="flex-1" disabled={!valid} onClick={submit}>
-          {editing ? "Guardar cambios" : status === "planned" ? "Programar" : type === "income" ? "Registrar ingreso" : "Registrar gasto"}
+          {editing ? "Guardar cambios" : status === "planned" ? "Programar" : isExp ? `Registrar gasto${valid ? " " + shown : ""}` : `Registrar ingreso${valid ? " " + shown : ""}`}
         </Button>
       </div>
     </div>

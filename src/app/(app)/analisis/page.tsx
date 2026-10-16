@@ -67,10 +67,10 @@ export default function Analisis() {
             <Chip active={mode === "cumulative"} onClick={() => setMode("cumulative")} className="h-8 px-2.5">Acumulado</Chip>
           </div>
         }>Evolución</SectionTitle>
-        <SpendArea data={a.data} currency={cur} cumulative={mode === "cumulative"} height={230} color={mode === "daily" ? "var(--neg)" : "var(--cyan)"} compare={mode === "daily"} />
+        <SpendArea data={a.data} currency={cur} cumulative={mode === "cumulative"} height={230} color="var(--chart)" compare={mode === "daily"} />
         <div className="num mt-2 flex gap-4 text-[11px] text-muted">
-          <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-neg" /> Gasto</span>
-          {mode === "daily" && <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-pos" /> Ingreso</span>}
+          <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-chart" /> Gasto</span>
+          {mode === "daily" && <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-ink" /> Ingreso</span>}
         </div>
       </Card>
 

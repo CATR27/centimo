@@ -56,7 +56,7 @@ export default function Proximos() {
             <h2 className={cn("text-[11px] font-semibold uppercase tracking-[0.14em]", g.tone)}>{g.title}</h2>
             <span className="num text-xs text-muted">{formatMoney(g.list.reduce((a, t) => a + t.amount, 0), cur)}</span>
           </div>
-          <div className="divide-y divide-line/60 rounded-2xl border border-line bg-surface px-3">
+          <div className="divide-y divide-line/60 rounded-3xl border border-line bg-surface px-3">
             {g.list.map((t) => (
               <div key={t.id}>
                 <TxRow tx={t} showDate onPay={() => markPaid(t.id)} />

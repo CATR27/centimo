@@ -26,7 +26,7 @@ export default function Categorias() {
           <div className="grid gap-2 sm:grid-cols-2">
             {categories.filter((c) => c.kind === kind).map((c) => (
               <button key={c.id} onClick={() => setEdit(c)}
-                className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-3 text-left active:bg-surface-2">
+                className="flex min-h-16 items-center gap-3 rounded-3xl border border-line bg-surface p-3 text-left active:bg-surface-2">
                 <span className="grid size-11 place-items-center rounded-xl" style={{ background: `color-mix(in srgb, ${c.color} 16%, transparent)`, color: c.color }}>
                   <CategoryIcon name={c.icon} className="size-5" />
                 </span>

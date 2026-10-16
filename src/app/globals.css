@@ -2,52 +2,68 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Paleta: neones contenidos y sólidos (sin brillos), superficies con profundidad. */
+/* Estilo fintech suave: panel salvia, tarjetas blancas, botones píldora, degradado lima → verde azulado. */
 :root {
-  --bg: #eef1f6;
+  --bg: #eef2f1;
+  --panel: #d6e0de;
   --surface: #ffffff;
-  --surface-2: #e8ecf3;
-  --border: #d5dbe6;
-  --text: #0b1220;
-  --muted: #5a677b;
-  --pos: #0a9d63;
-  --neg: #d91e6a;
-  --cyan: #0780a8;
-  --amber: #b87700;
-  --violet: #6d3fe0;
-  --accent: #0a9d63;
+  --surface-2: #f1f5f4;
+  --border: #e1e8e6;
+  --text: #0a0d0c;
+  --muted: #8a9693;
+  --pos: #1f9d7a;
+  --neg: #d6456f;
+  --cyan: #0e8fb0;
+  --amber: #b7791f;
+  --violet: #7357e0;
+  --accent: #0a0d0c;
   --accent-ink: #ffffff;
-  --geo: 11 18 32;
-  --geo-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 0H120M0 0V120' fill='none' stroke='%230b1220' stroke-opacity='.09'/%3E%3Cpath d='M-5 0H5M0 -5V5M115 0H125M120 -5V5' fill='none' stroke='%230b1220' stroke-opacity='.28'/%3E%3Cpath d='M0 120L120 0' fill='none' stroke='%230b1220' stroke-opacity='.045'/%3E%3C/svg%3E");
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 10px 24px -16px rgb(15 23 42 / 0.22);
-  --shadow-dock: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 -1px 2px rgb(15 23 42 / 0.05), 0 14px 32px -10px rgb(15 23 42 / 0.28), 0 2px 6px rgb(15 23 42 / 0.1);
+  --chart: #2a9d7c;
+  --ink-soft: #0a0d0c;
+  --lime: #eefc7a;
+  --lime-ink: #0a0d0c;
+  --grad: linear-gradient(180deg, #f0fd80 0%, #cdee86 38%, #5fb99b 100%);
+  --geo: 10 13 12;
+  --geo-a: .03;
+  --shadow-card: 0 1px 2px rgb(10 30 25 / 0.04), 0 14px 30px -20px rgb(10 30 25 / 0.2);
+  --shadow-dock: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 18px 36px -12px rgb(10 30 25 / 0.3), 0 2px 8px rgb(10 30 25 / 0.1);
   color-scheme: light;
 }
 
 .dark {
-  --bg: #06090e;
-  --surface: #0d131b;
-  --surface-2: #151d29;
-  --border: #212c3b;
-  --text: #e7ecf4;
-  --muted: #7e8b9d;
-  --pos: #2be08f;
-  --neg: #ff5a9d;
-  --cyan: #45c9f2;
-  --amber: #f3b933;
-  --violet: #a78bfa;
-  --accent: #2be08f;
-  --accent-ink: #03130b;
-  --geo: 150 175 210;
-  --geo-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 0H120M0 0V120' fill='none' stroke='%2396afd2' stroke-opacity='.09'/%3E%3Cpath d='M-5 0H5M0 -5V5M115 0H125M120 -5V5' fill='none' stroke='%2396afd2' stroke-opacity='.28'/%3E%3Cpath d='M0 120L120 0' fill='none' stroke='%2396afd2' stroke-opacity='.045'/%3E%3C/svg%3E");
-  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.045) inset, 0 1px 2px rgb(0 0 0 / 0.5), 0 14px 28px -16px rgb(0 0 0 / 0.7);
-  --shadow-dock: 0 1px 0 rgb(255 255 255 / 0.07) inset, 0 -1px 0 rgb(0 0 0 / 0.4) inset, 0 18px 36px -10px rgb(0 0 0 / 0.85), 0 2px 8px rgb(0 0 0 / 0.5);
+  --bg: #090c0b;
+  --panel: #141a19;
+  --surface: #1a2120;
+  --surface-2: #232b2a;
+  --border: #2b3534;
+  --text: #f2f5f4;
+  --muted: #8b9996;
+  --pos: #6fe3b4;
+  --neg: #ff7a9c;
+  --cyan: #5ccdf0;
+  --amber: #f3c04a;
+  --violet: #b19dff;
+  --accent: #f2f5f4;
+  --accent-ink: #0a0d0c;
+  --chart: #d9f26a;
+  --ink-soft: #e8efed;
+  --lime: #eefc7a;
+  --lime-ink: #0a0d0c;
+  --grad: linear-gradient(180deg, #e4f56f 0%, #a9d97c 40%, #4aa98b 100%);
+  --geo: 170 195 190;
+  --geo-a: .04;
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 14px 28px -18px rgb(0 0 0 / 0.8);
+  --shadow-dock: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 18px 36px -10px rgb(0 0 0 / 0.85), 0 2px 8px rgb(0 0 0 / 0.5);
   color-scheme: dark;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-chart: var(--chart);
+  --color-lime: var(--lime);
+  --color-lime-ink: var(--lime-ink);
   --color-surface-2: var(--surface-2);
   --color-line: var(--border);
   --color-ink: var(--text);
@@ -83,6 +99,7 @@ body {
 
 /* Fondo geométrico tipo plano técnico: cuadrícula fina + mayor + marcas de cruz y diagonales. */
 body::before {
+  opacity: .55;
   content: "";
   position: fixed;
   inset: 0;
@@ -90,15 +107,14 @@ body::before {
   pointer-events: none;
   background-image:
     var(--geo-tile),
-    linear-gradient(rgb(var(--geo) / 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--geo) / 0.035) 1px, transparent 1px);
+    linear-gradient(rgb(var(--geo) / var(--geo-a)) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--geo) / var(--geo-a)) 1px, transparent 1px);
   background-size: 120px 120px, 24px 24px, 24px 24px;
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 0.35) 100%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 0.35) 100%);
 }
 
 .num {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
@@ -141,3 +157,13 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 @keyframes ai-swing { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-18deg); } 60% { transform: rotate(10deg); } }
 @keyframes ai-spin { 0% { transform: rotate(-90deg) scale(.7); } 100% { transform: rotate(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .ai-play * { animation: none !important; } }
+
+/* Tarjeta con degradado (lima → verde azulado) */
+.grad-card { background: var(--grad); color: #0a0d0c; }
+.grad-card .muted-ink { color: rgb(10 13 12 / 0.6); }
+/* Teclado grande sin fondos */
+.keypad button { transition: transform .08s, color .15s; }
+.keypad button:active { transform: scale(.92); }
+@keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.caret { animation: caret 1s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
