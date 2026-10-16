@@ -23,3 +23,21 @@ Sin variables de entorno corre en **modo demo**: cualquier credencial entra y lo
 - `src/app/(auth)` login, registro, recuperación · `src/app/(app)` panel, historial, próximos, análisis, categorías, ajustes
 - `src/lib/store.tsx` estado con actualizaciones optimistas · `src/lib/data/*` repos Supabase y local
 - `src/lib/analytics.ts` agregaciones para gráficas · `src/components/charts` gráficas neón (Recharts)
+
+## Iniciar sesión con Google, GitHub, Discord o enlace mágico
+
+El login ofrece cuatro métodos además de correo y contraseña. El **enlace mágico** funciona desde el primer momento
+(usa el correo de Supabase, con límite bajo de envíos por hora). Los **proveedores sociales** hay que activarlos una vez
+en Supabase → *Authentication → Providers*; mientras no estén activos el botón muestra «Pronto» y avisa con un mensaje claro.
+
+Para todos usa esta **URL de callback** en la app del proveedor: `https://<tu-proyecto>.supabase.co/auth/v1/callback`
+y añade `http://localhost:3000/**` (y tu dominio) en *Authentication → URL Configuration → Redirect URLs*.
+
+- **Google**: Google Cloud Console → *APIs y servicios → Credenciales → ID de cliente OAuth* (tipo «Aplicación web») → copia Client ID y Secret a Supabase.
+- **GitHub**: GitHub → *Settings → Developer settings → OAuth Apps → New* → copia Client ID y genera un Client Secret.
+- **Discord**: [discord.com/developers/applications](https://discord.com/developers/applications) → *New Application → OAuth2* → copia Client ID y Secret.
+
+## Marca
+
+Logos en `public/brand/` (`logo-light.png` para tema claro, `logo-dark.png` para tema oscuro, `icon.png` y los íconos del manifest).
+El componente `Logo` alterna la versión según el tema.

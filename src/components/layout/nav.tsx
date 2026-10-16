@@ -92,9 +92,13 @@ export function Rail() {
       className="group/rail fixed inset-y-0 left-0 z-40 hidden w-[80px] print:!hidden flex-col overflow-hidden bg-panel py-5 transition-[width,box-shadow] duration-200 ease-out hover:w-[256px] hover:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] focus-within:w-[256px] focus-within:shadow-[24px_0_48px_-24px_rgb(10_30_25/0.35)] lg:flex"
     >
       <div className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-[17px] no-scrollbar">
-        <Link href="/dashboard" aria-label="Inicio" className={cn(RAIL_ITEM, "mb-3 h-12")}>
-          <span className="grid size-[46px] shrink-0 place-items-center"><Logo iconOnly /></span>
-          <span className="whitespace-nowrap pr-4 text-lg font-semibold tracking-tight opacity-0 transition-opacity group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">centimo</span>
+        <Link href="/dashboard" aria-label="Inicio" className={cn(RAIL_ITEM, "mb-3 h-12 overflow-visible")}>
+          <span className="grid size-[46px] shrink-0 place-items-center transition-opacity duration-150 group-hover/rail:opacity-0 group-focus-within/rail:opacity-0">
+            <Logo iconOnly className="size-10" />
+          </span>
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100">
+            <Logo className="[&_img]:h-10" />
+          </span>
         </Link>
 
         <button onClick={() => open()} aria-label="Nuevo movimiento"
