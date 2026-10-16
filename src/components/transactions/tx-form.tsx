@@ -1,6 +1,6 @@
 "use client";
 
-import { Delete, Trash2 } from "lucide-react";
+import { Check, Delete, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CategoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,8 @@ import { Sheet } from "@/components/ui/sheet";
 import { addDaysISO, today } from "@/lib/dates";
 import { currencyInfo, currencySymbol, toMajor, toMinor } from "@/lib/money";
 import { useStore } from "@/lib/store";
-import type { Recurrence, Transaction, TxStatus, TxType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { NEON_COLORS, type Recurrence, type Transaction, type TxStatus, type TxType } from "@/lib/types";
+import { cn, uid } from "@/lib/utils";
 import type { OpenOpts } from "./quick-add";
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "del"] as const;
@@ -28,7 +28,7 @@ export function TxFormSheet({ open, opts, onClose }: { open: boolean; opts: Open
 }
 
 function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
-  const { categories, settings, addTx, updateTx, removeTx } = useStore();
+  const { categories, settings, addTx, updateTx, removeTx, saveCategory } = useStore();
   const cur = settings.currency;
   const decimals = currencyInfo(cur).decimals;
   const editing = opts.tx;
@@ -40,6 +40,10 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
   const [date, setDate] = useState(editing?.date ?? addDaysISO(today(), opts.status === "planned" ? 1 : 0));
   const [status, setStatus] = useState<TxStatus>(editing?.status ?? opts.status ?? "paid");
   const [rec, setRec] = useState<Recurrence>(editing?.recurrence ?? null);
+
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newColor, setNewColor] = useState<string>(NEON_COLORS[0]);
 
   const cats = useMemo(() => categories.filter((c) => c.kind === type), [categories, type]);
   useEffect(() => {
@@ -56,6 +60,16 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
       return v.length >= 12 ? v : v + k;
     });
   };
+
+  function createCategory() {
+    const name = newName.trim();
+    if (!name) return;
+    const id = uid();
+    saveCategory({ id, name, kind: type, icon: "tag", color: newColor, monthlyBudget: null });
+    setCategoryId(id);
+    setNewName("");
+    setCreating(false);
+  }
 
   const amount = toMinor(Number(raw || 0), cur);
   const valid = amount > 0 && !!date;
@@ -91,6 +105,13 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
       </div>
 
       <div className="-mx-5 flex gap-2 overflow-x-auto px-5 no-scrollbar" role="radiogroup" aria-label="Categoría">
+        <button
+          onClick={() => setCreating((v) => !v)} aria-expanded={creating}
+          className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-dashed px-3 text-sm transition",
+            creating ? "border-accent text-accent" : "border-line text-accent")}
+        >
+          <Plus className="size-4" /> Nueva
+        </button>
         {cats.map((c) => {
           const on = categoryId === c.id;
           return (
@@ -100,11 +121,39 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
               style={on ? { borderColor: c.color, background: `color-mix(in srgb, ${c.color} 16%, transparent)` } : undefined}
             >
               <CategoryIcon name={c.icon} className="size-4" />
-              <span style={on ? undefined : undefined}>{c.name}</span>
+              <span>{c.name}</span>
             </button>
           );
         })}
       </div>
+
+      {creating && (
+        <div className="space-y-3 rounded-xl border border-line bg-surface-2 p-3">
+          <div className="flex gap-2">
+            <input
+              value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={40} autoFocus
+              onKeyDown={(e) => e.key === "Enter" && createCategory()}
+              placeholder={type === "expense" ? "Nombre (ej. Mascotas)" : "Nombre (ej. Ventas)"}
+              className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-base outline-none focus:border-accent"
+            />
+            <button
+              onClick={createCategory} disabled={!newName.trim()} aria-label="Crear categoría"
+              className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent text-accent-ink disabled:opacity-40"
+            >
+              <Check className="size-5" />
+            </button>
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1" role="radiogroup" aria-label="Color">
+            {NEON_COLORS.map((c) => (
+              <button
+                key={c} role="radio" aria-checked={newColor === c} aria-label={`Color ${c}`} onClick={() => setNewColor(c)}
+                className={cn("size-8 shrink-0 rounded-full ring-offset-2 ring-offset-surface-2 transition", newColor === c && "ring-2")}
+                style={{ background: c, boxShadow: `0 0 10px ${c}88`, ["--tw-ring-color" as string]: c }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-2">
         {KEYS.map((k) => (
@@ -162,7 +211,7 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
           </Button>
         )}
         <Button size="lg" className="flex-1" disabled={!valid} onClick={submit}>
-          {editing ? "Guardar cambios" : status === "planned" ? "Programar" : "Registrar"}
+          {editing ? "Guardar cambios" : status === "planned" ? "Programar" : type === "income" ? "Registrar ingreso" : "Registrar gasto"}
         </Button>
       </div>
     </div>

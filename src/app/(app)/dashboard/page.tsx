@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowDownLeft, ArrowUpRight, Scale } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Minus, Plus, Scale } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BudgetBar, CategoryDonut, SpendArea } from "@/components/charts/charts";
 import { CategoryIcon } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { PeriodChips } from "@/components/period-chips";
+import { useQuickAdd } from "@/components/transactions/quick-add";
 import { TxRow } from "@/components/transactions/tx-row";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { Delta, EmptyState, Skeleton } from "@/components/ui/misc";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const { ready, transactions, categories, settings, markPaid } = useStore();
+  const open = useQuickAdd();
   const [period, setPeriod] = useState<Period>("30D");
   const cur = settings.currency;
 
@@ -47,6 +49,18 @@ export default function Dashboard() {
     <div className="space-y-4">
       <PageHeader title={greeting} sub="Tu panel de gastos" />
       <div className="-mx-4 overflow-x-auto px-4 no-scrollbar"><PeriodChips value={period} onChange={setPeriod} /></div>
+
+      {/* Acciones rápidas */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <button onClick={() => open({ type: "expense" })}
+          className="flex h-12 items-center justify-center gap-2 rounded-xl border border-neg/40 bg-neg/10 text-sm font-semibold text-neg active:scale-[0.98]">
+          <Minus className="size-4" /> Gasto
+        </button>
+        <button onClick={() => open({ type: "income" })}
+          className="flex h-12 items-center justify-center gap-2 rounded-xl border border-pos/40 bg-pos/10 text-sm font-semibold text-pos active:scale-[0.98]">
+          <Plus className="size-4" /> Ingreso
+        </button>
+      </div>
 
       {/* Ticker principal */}
       <Card className="relative overflow-hidden">
