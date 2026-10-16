@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { z } from "zod";
+import { BrandLoader } from "@/components/brand-loader";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { getProviderStatus, resetPassword, signIn, signInWithMagicLink, signInWithProvider, signUp, type Provider, type ProviderStatus } from "@/lib/auth";
@@ -65,6 +66,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<string | null>(null);
+  const [entering, setEntering] = useState(false);
   const [enabled, setEnabled] = useState<ProviderStatus | null>(null);
   useEffect(() => { getProviderStatus().then(setEnabled); }, []);
   const copy = COPY[mode];
@@ -106,6 +108,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (!err) { setNotice("Si el correo existe, te enviamos un enlace."); setBusy(null); return; }
     }
     if (err) { setErrors({ form: err }); setBusy(null); return; }
+    setEntering(true);
     router.replace("/dashboard");
     router.refresh();
   }
@@ -123,13 +126,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
     }
     const err = await signInWithProvider(p);
     if (err) { setErrors({ form: err }); setBusy(null); }
-    else if (isDemo) router.replace("/dashboard");
+    else if (isDemo) { setEntering(true); router.replace("/dashboard"); }
   }
 
   const socialBtn = "relative h-12 min-w-0 flex-1 gap-2.5 font-semibold";
 
   return (
     <div>
+      {/* Transición de entrada: se mantiene hasta que la navegación desmonta el login. */}
+      {entering && <BrandLoader duration={1100} />}
       {mode === "forgot" ? (
         <Link href="/login" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-ink/70 hover:text-ink">
           <ArrowLeft className="size-4" /> Volver

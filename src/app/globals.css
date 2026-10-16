@@ -178,3 +178,17 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   :root, .dark { --bg: #fff; --surface: #fff; --surface-2: #f3f5f4; --text: #0a0d0c; --muted: #5d6865; --border: #d8dedc; color-scheme: light; }
   [data-sonner-toaster] { display: none; }
 }
+
+/* Loader de marca: cinta de indicadores y reveal del logo */
+.ticker-track { display: flex; width: max-content; animation: ticker 22s linear infinite; }
+.ticker-rev { animation-direction: reverse; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.logo-reveal { animation: logo-reveal .7s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes logo-reveal {
+  from { clip-path: inset(0 100% 0 0); transform: translateY(8px) scale(.96); opacity: .4; }
+  to { clip-path: inset(0 0 0 0); transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+  .logo-reveal { animation: none; }
+}
