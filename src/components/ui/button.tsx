@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "ghost" | "outline" | "danger";
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-accent-ink font-semibold shadow-[var(--glow)] active:brightness-90",
+  primary: "bg-accent text-accent-ink font-semibold active:brightness-90",
   ghost: "text-ink hover:bg-surface-2 active:bg-surface-2",
   outline: "border border-line text-ink hover:bg-surface-2 active:bg-surface-2",
   danger: "border border-neg/40 text-neg hover:bg-neg/10 active:bg-neg/10",

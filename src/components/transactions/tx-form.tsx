@@ -1,9 +1,10 @@
 "use client";
 
 import { Check, Delete, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CategoryIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { HScroll } from "@/components/ui/hscroll";
 import { Sheet } from "@/components/ui/sheet";
 import { addDaysISO, today } from "@/lib/dates";
 import { currencyInfo, currencySymbol, toMajor, toMinor } from "@/lib/money";
@@ -83,6 +84,25 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
     onClose();
   }
 
+  // Teclado físico: dígitos, punto/coma, Backspace y Enter (si no se está escribiendo en un campo).
+  const keys = useRef({ press, submit, valid });
+  keys.current = { press, submit, valid };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.target as HTMLElement | null)?.closest("input, textarea, select, [contenteditable]")) return;
+      const k = keys.current;
+      if (/^[0-9]$/.test(e.key)) k.press(e.key as (typeof KEYS)[number]);
+      else if (e.key === "." || e.key === ",") k.press(".");
+      else if (e.key === "Backspace") k.press("del");
+      else if (e.key === "Enter" && k.valid) k.submit();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="space-y-4 pb-2">
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1" role="radiogroup" aria-label="Tipo">
@@ -98,13 +118,13 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
       </div>
 
       <div className="py-1 text-center" aria-live="polite">
-        <div className={cn("num flex items-baseline justify-center gap-1.5 text-5xl font-semibold", type === "expense" ? "text-neg" : "text-pos", "glow-text")}>
+        <div className={cn("num flex items-baseline justify-center gap-1.5 text-5xl font-semibold", type === "expense" ? "text-neg" : "text-pos")}>
           <span className="text-2xl opacity-70">{currencySymbol(cur)}</span>
           <span className={cn(!raw && "opacity-30")}>{shown}</span>
         </div>
       </div>
 
-      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 no-scrollbar" role="radiogroup" aria-label="Categoría">
+      <div className="flex max-h-[7.25rem] flex-wrap gap-2 overflow-y-auto overscroll-contain" role="radiogroup" aria-label="Categoría">
         <button
           onClick={() => setCreating((v) => !v)} aria-expanded={creating}
           className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-dashed px-3 text-sm transition",
@@ -143,15 +163,15 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
               <Check className="size-5" />
             </button>
           </div>
-          <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1" role="radiogroup" aria-label="Color">
+          <HScroll className="flex gap-2.5 py-1" role="radiogroup" aria-label="Color">
             {NEON_COLORS.map((c) => (
               <button
                 key={c} role="radio" aria-checked={newColor === c} aria-label={`Color ${c}`} onClick={() => setNewColor(c)}
                 className={cn("size-8 shrink-0 rounded-full ring-offset-2 ring-offset-surface-2 transition", newColor === c && "ring-2")}
-                style={{ background: c, boxShadow: `0 0 10px ${c}88`, ["--tw-ring-color" as string]: c }}
+                style={{ background: c, ["--tw-ring-color" as string]: c }}
               />
             ))}
-          </div>
+          </HScroll>
         </div>
       )}
 
@@ -194,14 +214,14 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
       </div>
 
       {status === "planned" && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar" role="radiogroup" aria-label="Repetición">
+        <HScroll className="flex gap-2" role="radiogroup" aria-label="Repetición">
           {REC.map((r) => (
             <button key={r.label} role="radio" aria-checked={rec === r.v} onClick={() => setRec(r.v)}
               className={cn("num h-9 shrink-0 rounded-lg border px-3.5 text-xs", rec === r.v ? "border-accent/60 bg-accent/15 text-accent" : "border-line text-muted")}>
               {r.label}
             </button>
           ))}
-        </div>
+        </HScroll>
       )}
 
       <div className="flex gap-2 pt-1">

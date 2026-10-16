@@ -9,15 +9,11 @@ const TICKS = [
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative grid min-h-dvh overflow-hidden lg:grid-cols-2">
-      <div className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]" />
-      <div className="animate-drift pointer-events-none absolute -left-24 -top-24 size-80 rounded-full bg-accent/20 blur-[90px]" />
-      <div className="animate-drift pointer-events-none absolute -bottom-32 -right-20 size-96 rounded-full bg-[#ff2e97]/15 blur-[100px] [animation-delay:-6s]" />
-
       <aside className="relative hidden flex-col justify-between p-12 lg:flex">
         <Logo />
         <div>
           <p className="num text-6xl font-semibold leading-[1.05] tracking-tight">
-            Tu dinero,<br /><span className="text-accent glow-text">en tiempo real.</span>
+            Tu dinero,<br /><span className="text-accent">en tiempo real.</span>
           </p>
           <p className="mt-5 max-w-sm text-muted">Registra, programa y analiza cada gasto con la claridad de una terminal de trading.</p>
           <div className="mt-10 flex gap-3">

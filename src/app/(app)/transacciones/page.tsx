@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { TxRow } from "@/components/transactions/tx-row";
 import { Chip } from "@/components/ui/chip";
+import { HScroll } from "@/components/ui/hscroll";
 import { EmptyState, Skeleton } from "@/components/ui/misc";
 import { dayHeading } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -37,7 +38,7 @@ export default function Transacciones() {
   return (
     <div>
       <PageHeader title="Historial" sub={`${filtered.length} movimientos`} />
-      <div className="sticky top-14 z-20 -mx-4 space-y-2.5 bg-bg/90 px-4 pb-3 pt-1 backdrop-blur lg:top-0">
+      <div className="sticky top-[5.75rem] z-20 -mx-4 space-y-2.5 bg-bg/90 px-4 pb-3 pt-1 backdrop-blur lg:top-0">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted" />
           <input
@@ -45,7 +46,7 @@ export default function Transacciones() {
             className="h-12 w-full rounded-xl border border-line bg-surface pl-10 pr-3 text-base outline-none focus:border-accent"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+        <HScroll className="flex gap-2">
           {([["all", "Todo"], ["expense", "Gastos"], ["income", "Ingresos"]] as const).map(([v, l]) => (
             <Chip key={v} active={type === v} onClick={() => setType(v)}>{l}</Chip>
           ))}
@@ -54,7 +55,7 @@ export default function Transacciones() {
           {categories.map((c) => (
             <Chip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)}>{c.name}</Chip>
           ))}
-        </div>
+        </HScroll>
       </div>
 
       {!ready ? <div className="space-y-2"><Skeleton className="h-16" /><Skeleton className="h-16" /><Skeleton className="h-16" /></div>
