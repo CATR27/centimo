@@ -49,7 +49,7 @@ export function Sheet({ open, onClose, title, subtitle, children }: {
           />
           <motion.div
             role="dialog" aria-modal="true" aria-label={title}
-            className="relative flex max-h-[94dvh] w-full flex-col rounded-t-[36px] bg-bg lg:max-h-none lg:max-w-[440px] lg:rounded-l-[36px] lg:rounded-tr-none"
+            className="relative flex max-h-[94dvh] w-full flex-col rounded-t-[36px] bg-bg lg:m-4 lg:max-h-none lg:max-w-[440px] lg:rounded-[32px] lg:rounded-tr-none"
             initial={hidden} animate={shown} exit={hidden}
             transition={{ type: "spring", damping: 34, stiffness: 340 }}
             drag={desktop ? false : "y"} dragControls={controls} dragListener={false}
@@ -65,7 +65,7 @@ export function Sheet({ open, onClose, title, subtitle, children }: {
                 </h2>
                 <button
                   onClick={onClose} onPointerDown={(e) => e.stopPropagation()} aria-label="Cerrar"
-                  className="grid size-10 place-items-center rounded-full text-ink hover:bg-surface-2"
+                  className="grid size-10 place-items-center rounded-full bg-surface text-ink transition active:scale-95"
                 >
                   <X className="size-5" />
                 </button>

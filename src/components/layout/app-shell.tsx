@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Dock, Rail, TopBar } from "@/components/layout/nav";
+import { Dock, Rail } from "@/components/layout/nav";
 import { QuickAddProvider } from "@/components/transactions/quick-add";
 import { demoSignedIn } from "@/lib/auth";
 import { StoreProvider } from "@/lib/store";
@@ -34,10 +34,9 @@ export function AppShell({ children }: { children: ReactNode }) {
 function Frame({ children }: { children: ReactNode }) {
   usePathname(); // re-render del layout al navegar
   return (
-    <div className="min-h-dvh lg:pl-[80px] print:pl-0">
+    <div className="min-h-dvh lg:pl-[112px] print:pl-0">
       <Rail />
-      <TopBar />
-      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 lg:max-w-[1400px] lg:px-8 lg:pb-12 lg:pt-10 print:max-w-none print:p-0">
+      <main className="mx-auto w-full max-w-2xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-[calc(env(safe-area-inset-top)+0.75rem)] lg:max-w-[1400px] lg:px-8 lg:pb-12 lg:pt-10 print:max-w-none print:p-0">
         {children}
       </main>
       <Dock />

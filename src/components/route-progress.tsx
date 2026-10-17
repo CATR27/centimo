@@ -44,7 +44,7 @@ export function RouteProgress() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 z-[90] h-[3px] print:hidden"
       style={{ top: "env(safe-area-inset-top)" }}>
-      <div className="h-full rounded-r-full bg-chart transition-[width,opacity] duration-200 ease-out"
+      <div className="h-full rounded-r-full bg-accent transition-[width,opacity] duration-200 ease-out"
         style={{ width: `${value}%`, opacity: visible ? 1 : 0 }} />
     </div>
   );

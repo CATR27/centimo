@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeftRight, CreditCard, Landmark, PiggyBank, Plus, Trash2, Wallet, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { PageHeader } from "@/components/page-header";
+import { AnimatedIcon, type IconName } from "@/components/animated-icon";
+import { HeroBanner } from "@/components/design";
+import { PageHeader, RoundAction } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Field, Input } from "@/components/ui/input";
 import { EmptyState, Skeleton } from "@/components/ui/misc";
@@ -16,7 +17,7 @@ import { useStore } from "@/lib/store";
 import { ACCOUNT_TYPES, NEON_COLORS, type Account, type AccountType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const ICON: Record<AccountType, LucideIcon> = { cash: Wallet, bank: Landmark, card: CreditCard, savings: PiggyBank };
+const ICON: Record<AccountType, IconName> = { cash: "cash", bank: "banco", card: "tarjeta", savings: "wallet" };
 
 export default function Cuentas() {
   const { ready, accounts, transactions, settings } = useStore();
@@ -29,12 +30,12 @@ export default function Cuentas() {
   if (!ready) return <Skeleton className="h-96 rounded-[36px]" />;
 
   return (
-    <div>
+    <div className="space-y-3.5">
       <PageHeader title="Cuentas" sub="Efectivo, bancos y tarjetas"
         right={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setTransfer(true)} disabled={accounts.length < 2}><ArrowLeftRight className="size-4" /> Transferir</Button>
-            <Button onClick={() => setEdit({ type: "bank", color: NEON_COLORS[1], openingBalance: 0 })}><Plus className="size-4" /> Nueva</Button>
+            <RoundAction aria-label="Transferir" disabled={accounts.length < 2} onClick={() => setTransfer(true)} className="disabled:opacity-40"><ArrowLeftRight className="size-5" /></RoundAction>
+            <RoundAction aria-label="Nueva cuenta" onClick={() => setEdit({ type: "bank", color: NEON_COLORS[1], openingBalance: 0 })}><AnimatedIcon name="mas" className="size-[21px]" /></RoundAction>
           </div>
         } />
 
@@ -42,29 +43,35 @@ export default function Cuentas() {
         <EmptyState title="Aún no hay cuentas" hint="Si usas Supabase, ejecuta la migración 0002 para activar cuentas." />
       ) : (
         <>
-          <Card className="grad-card mb-6 rounded-[36px] border-0 p-6">
-            <p className="muted-ink text-xs font-medium">Patrimonio total</p>
-            <p className="num mt-2 truncate text-[clamp(2rem,8vw,3.25rem)] font-semibold leading-none tracking-tight">{formatMoney(total, cur)}</p>
-            <p className="muted-ink num mt-2 text-xs">{accounts.length} {accounts.length === 1 ? "cuenta" : "cuentas"}</p>
-          </Card>
+          <HeroBanner tone="grad" avatar={15}>
+            <span className="text-[13px] font-semibold uppercase tracking-[0.14em] muted-ink">Patrimonio total</span>
+            <span className="num truncate text-[32px] font-semibold leading-none">{formatMoney(total, cur)}</span>
+            <span className="muted-ink num text-[13px]">{accounts.length} {accounts.length === 1 ? "cuenta" : "cuentas"}</span>
+          </HeroBanner>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {balances.map(({ account: a, balance, income, expense }) => {
-              const Icon = ICON[a.type];
+          <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
+            {balances.map(({ account: a, balance, income, expense }, i) => {
+              const tone = a.type === "card" ? "lime" : i === 0 ? "dark" : "white";
               return (
-                <button key={a.id} onClick={() => setEdit(a)} className="neon-card rounded-[28px] border border-line/70 bg-surface p-5 text-left transition active:scale-[0.99]">
-                  <div className="flex items-center gap-3">
-                    <span className="grid size-12 place-items-center rounded-full" style={{ background: `color-mix(in srgb, ${a.color} 20%, transparent)`, color: a.color }}><Icon className="size-5" /></span>
-                    <div className="min-w-0">
-                      <p className="truncate text-[15px] font-semibold">{a.name}</p>
-                      <p className="text-xs text-muted">{ACCOUNT_TYPES.find((t) => t.v === a.type)?.label}</p>
-                    </div>
-                  </div>
-                  <p className={cn("num mt-5 truncate text-2xl font-semibold", balance < 0 && "text-neg")}>{formatMoney(balance, cur)}</p>
-                  <div className="num mt-2 flex gap-4 text-xs">
-                    <span className="text-pos">▲ {formatCompact(income, cur)}</span>
-                    <span className="text-muted">▼ {formatCompact(expense, cur)}</span>
-                  </div>
+                <button key={a.id} onClick={() => setEdit(a)}
+                  className={cn("flex flex-col gap-4 rounded-[28px] px-[18px] py-4 text-left transition active:scale-[0.99]",
+                    tone === "dark" && "card-dark", tone === "lime" && "bg-lime text-lime-ink", tone === "white" && "bg-surface")}>
+                  <span className="flex w-full items-center gap-3">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-full"
+                      style={tone === "white" ? { background: a.color, color: "#fff" } : tone === "dark" ? { background: "#eefc7a", color: "#0a0d0c" } : { background: "#0a0d0c", color: "#eefc7a" }}>
+                      <AnimatedIcon name={ICON[a.type]} className="size-5" />
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                      <span className="truncate text-base font-semibold">{a.name}</span>
+                      <span className="text-xs opacity-60">{ACCOUNT_TYPES.find((t) => t.v === a.type)?.label}</span>
+                    </span>
+                  </span>
+                  <span className="flex w-full items-end justify-between gap-2">
+                    <span className={cn("num truncate text-[28px] font-semibold leading-none", balance < 0 && (tone === "dark" ? "text-[#ff7a9c]" : "text-neg"))}>{formatMoney(balance, cur)}</span>
+                    <span className="num flex shrink-0 flex-col text-right text-xs opacity-70">
+                      <span>▲ {formatCompact(income, cur)}</span><span>▼ {formatCompact(expense, cur)}</span>
+                    </span>
+                  </span>
                 </button>
               );
             })}

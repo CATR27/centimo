@@ -5,11 +5,12 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { AnimatedIcon } from "@/components/animated-icon";
+import { Avatar } from "@/components/avatar";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-xl bg-surface-2", className)} />;
+  return <div className={cn("animate-pulse rounded-3xl bg-surface", className)} />;
 }
 
 /** Logo oficial. El horizontal alterna según el tema (texto oscuro en claro, texto claro en oscuro). */
@@ -54,7 +55,7 @@ export function ThemeSwitch() {
   );
 }
 
-export function ThemeToggleIcon() {
+export function ThemeToggleIcon({ className, dark }: { className?: string; dark?: boolean }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -62,9 +63,10 @@ export function ThemeToggleIcon() {
     <button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       aria-label="Cambiar tema"
-      className="grid size-11 place-items-center rounded-full bg-surface text-ink shadow-sm hover:bg-surface-2"
+      className={cn("grid size-12 place-items-center rounded-full transition",
+        dark ? "bg-dk-3 text-dk-text hover:bg-dk-line" : "bg-surface text-ink hover:bg-surface-2", className)}
     >
-      {mounted && resolvedTheme === "light" ? <Moon className="size-5" /> : <Sun className="size-5" />}
+      <AnimatedIcon name={mounted && resolvedTheme === "light" ? "luna" : "sol"} className="size-5" strokeWidth={2} />
     </button>
   );
 }
@@ -82,22 +84,25 @@ export function Delta({ value, invert = false, className }: { value: number | nu
 
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="grid place-items-center rounded-[24px] border border-dashed border-muted/40 px-6 py-12 text-center">
-      <p className="text-sm font-medium">{title}</p>
+    <div className="grid place-items-center rounded-[28px] border-2 border-dashed border-muted/30 px-6 py-10 text-center">
+      <Avatar n={10} className="mb-1 size-24" />
+      <p className="text-sm font-semibold">{title}</p>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
     </div>
   );
 }
 
 /** Oculta o muestra todos los montos de la app. */
-export function PrivacyToggle({ className }: { className?: string }) {
+export function PrivacyToggle({ className, dark }: { className?: string; dark?: boolean }) {
   const { privacy, togglePrivacy } = useStore();
   return (
     <button
       onClick={togglePrivacy} aria-pressed={privacy} aria-label={privacy ? "Mostrar montos" : "Ocultar montos"}
       title={privacy ? "Mostrar montos" : "Ocultar montos"}
-      className={cn("relative grid size-11 place-items-center rounded-full shadow-sm transition",
-        privacy ? "bg-accent text-accent-ink" : "bg-surface text-ink hover:bg-surface-2", className)}
+      className={cn("relative grid size-12 place-items-center rounded-full transition",
+        dark
+          ? (privacy ? "bg-lime text-lime-ink" : "bg-dk-3 text-dk-text hover:bg-dk-line")
+          : (privacy ? "bg-accent text-accent-ink" : "bg-surface text-ink hover:bg-surface-2"), className)}
     >
       <AnimatedIcon name="privado" className="size-5" />
       {privacy && <span aria-hidden className="absolute h-0.5 w-6 -rotate-45 rounded-full bg-current" />}

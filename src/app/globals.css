@@ -25,6 +25,12 @@
   --grad: linear-gradient(180deg, #f0fd80 0%, #cdee86 38%, #5fb99b 100%);
   --geo: 10 13 12;
   --geo-a: .03;
+  --dk: #141a19;
+  --dk-2: #1a2120;
+  --dk-3: #232b2a;
+  --dk-line: #2b3534;
+  --dk-muted: #8b9996;
+  --dk-text: #e8efed;
   --shadow-card: 0 1px 2px rgb(10 30 25 / 0.04), 0 14px 30px -20px rgb(10 30 25 / 0.2);
   --shadow-dock: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 18px 36px -12px rgb(10 30 25 / 0.3), 0 2px 8px rgb(10 30 25 / 0.1);
   color-scheme: light;
@@ -65,6 +71,12 @@
   --color-lime: var(--lime);
   --color-lime-ink: var(--lime-ink);
   --color-surface-2: var(--surface-2);
+  --color-dk: var(--dk);
+  --color-dk-2: var(--dk-2);
+  --color-dk-3: var(--dk-3);
+  --color-dk-line: var(--dk-line);
+  --color-dk-muted: var(--dk-muted);
+  --color-dk-text: var(--dk-text);
   --color-line: var(--border);
   --color-ink: var(--text);
   --color-muted: var(--muted);
@@ -75,8 +87,8 @@
   --color-violet: var(--violet);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-sans: var(--font-saira), "Saira Semi Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-saira), ui-monospace, SFMono-Regular, monospace;
 }
 
 * {
@@ -95,23 +107,6 @@ body {
   font-family: var(--font-sans);
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
-}
-
-/* Fondo geométrico tipo plano técnico: cuadrícula fina + mayor + marcas de cruz y diagonales. */
-body::before {
-  opacity: .55;
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    var(--geo-tile),
-    linear-gradient(rgb(var(--geo) / var(--geo-a)) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--geo) / var(--geo-a)) 1px, transparent 1px);
-  background-size: 120px 120px, 24px 24px, 24px 24px;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 0.35) 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 0.35) 100%);
 }
 
 .num {
@@ -160,7 +155,7 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
 @keyframes ai-swing { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-18deg); } 60% { transform: rotate(10deg); } }
 @keyframes ai-drop { 0% { transform: translateY(-6px); opacity: .2; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes ai-spin { 0% { transform: rotate(-90deg) scale(.7); } 100% { transform: rotate(0) scale(1); } }
-@media (prefers-reduced-motion: reduce) { .ai-play * { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .ai-play *, .ic-idle, .ic-idle *, .av-float { animation: none !important; } }
 
 /* Tarjeta con degradado (lima → verde azulado) */
 .grad-card { background: var(--grad); color: #0a0d0c; }
@@ -192,3 +187,59 @@ input[type="number"]::-webkit-inner-spin-button { display: none; }
   .ticker-track { animation: none; }
   .logo-reveal { animation: none; }
 }
+
+/* Tarjeta oscura con trama diagonal (diseño v4) */
+.card-dark { background-color: var(--dk); background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / .025) 0 1px, transparent 1px 14px); color: #fff; }
+
+/* ───────── Movimiento sutil de SVG ───────── */
+/* Avatares: balanceo suave, desfasado por avatar con --d. */
+.av-float { display: inline-block; transform-origin: 50% 90%; animation: av-float 6.5s ease-in-out infinite; animation-delay: var(--d, 0s); will-change: transform; }
+@keyframes av-float {
+  0%, 100% { transform: translateY(0) rotate(-1.2deg); }
+  50% { transform: translateY(-3px) rotate(1.2deg); }
+}
+/* Ilustraciones decorativas del login (chips, formas) */
+.deco-float { animation: deco-float 7s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes deco-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+.deco-spin { animation: deco-spin 28s linear infinite; }
+@keyframes deco-spin { to { rotate: 360deg; } }
+.deco-bar { transform-box: fill-box; transform-origin: bottom; animation: ic-bars 3.6s ease-in-out infinite; animation-delay: var(--d, 0s); }
+
+/* Iconos: respiración leve + gesto propio por icono. Solo transform/opacity. */
+.ic-idle { animation: ic-breathe 5.5s ease-in-out infinite; transform-origin: center; }
+@keyframes ic-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+.ic-idle .id-pulse { transform-box: fill-box; transform-origin: center; animation: ic-pulse 3.6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * 260ms); }
+@keyframes ic-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.82); opacity: .7; } }
+.ic-idle .id-bars { transform-box: fill-box; transform-origin: bottom; animation: ic-bars 3.6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * 300ms); }
+@keyframes ic-bars { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.84); } }
+.ic-idle .id-sway { transform-box: fill-box; transform-origin: 20% 20%; animation: ic-sway 5s ease-in-out infinite; }
+@keyframes ic-sway { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-6deg); } }
+.ic-idle .id-rock { transform-box: fill-box; transform-origin: center; animation: ic-rock 6s ease-in-out infinite; }
+@keyframes ic-rock { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+.ic-idle .id-bob { animation: ic-bob 3.2s ease-in-out infinite; }
+@keyframes ic-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.2px); } }
+.ic-idle .id-slide { animation: ic-slide 4.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * 500ms); }
+@keyframes ic-slide { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(var(--dx, 1.2px)); } }
+.ic-idle .id-dash { stroke-dasharray: 30; animation: ic-dash 6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * 400ms); }
+@keyframes ic-dash { 0%, 70%, 100% { stroke-dashoffset: 0; } 82% { stroke-dashoffset: 30; } 94% { stroke-dashoffset: 0; } }
+.ic-idle .id-gaze { animation: ic-gaze 6s ease-in-out infinite; }
+@keyframes ic-gaze { 0%, 100% { transform: translateX(0); } 35% { transform: translateX(1.1px); } 70% { transform: translateX(-1.1px); } }
+.ic-idle .id-drift { transform-box: fill-box; transform-origin: center; animation: ic-drift 5s ease-in-out infinite; }
+@keyframes ic-drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(.8px, -.8px); } }
+
+/* Entradas de gráficas: la línea se dibuja y los segmentos de la dona crecen */
+.line-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: line-draw 1.1s ease-out .1s forwards; }
+@keyframes line-draw { to { stroke-dashoffset: 0; } }
+.donut-seg { animation: donut-in .7s cubic-bezier(.3, 1.2, .5, 1) both; transform-box: fill-box; transform-origin: center; }
+@keyframes donut-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .line-draw { animation: none; stroke-dashoffset: 0; } .donut-seg { animation: none; } }
+
+/* Barras y bloques que entran con un leve crecimiento */
+.bar-in { transform-origin: left; animation: bar-in .8s cubic-bezier(.3, 1.1, .5, 1) both; }
+@keyframes bar-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.blk { animation: blk-in .45s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes blk-in { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bar-in, .blk { animation: none; } }
+.grow-y { transform-origin: bottom; animation: grow-y .7s cubic-bezier(.3, 1.2, .5, 1) both; }
+@keyframes grow-y { from { transform: scaleY(.1); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .grow-y { animation: none; } }

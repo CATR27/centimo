@@ -1,88 +1,81 @@
-import { Utensils, Home } from "lucide-react";
-import { Sparkline } from "@/components/charts/charts";
-import { Logo, ThemeToggleIcon } from "@/components/ui/misc";
+import { AnimatedIcon, type IconName } from "@/components/animated-icon";
+import { Avatar } from "@/components/avatar";
+import { ThemeToggleIcon } from "@/components/ui/misc";
 import { isDemo } from "@/lib/supabase/env";
+import { cn } from "@/lib/utils";
 
-const SPARK = [18, 22, 19, 27, 24, 31, 28, 36, 33, 41, 38, 47];
+const STEPS: { n: string; title: string; avatar: number; icon: IconName; value: string; sub: string; tone: "light" | "dark" }[] = [
+  { n: "01", title: "Registra", avatar: 4, icon: "nuevo", value: "−$ 45.500", sub: "Domicilio · hoy", tone: "light" },
+  { n: "02", title: "Programa", avatar: 13, icon: "proximos", value: "−$ 1.150.000", sub: "Arriendo · 6 días", tone: "dark" },
+  { n: "03", title: "Entiende", avatar: 10, icon: "analisis", value: "Hogar 48%", sub: "del gasto de abril", tone: "light" },
+];
 
-/** Composición decorativa con los mismos componentes visuales del dashboard (no interactiva). */
+/** Panel de marca de escritorio (diseño 3b): degradado, titular grande y los 3 pasos con personajes. */
 function Showcase() {
   return (
-    <div aria-hidden className="grid max-w-xl grid-cols-2 gap-3">
-      <div className="rounded-[28px] bg-surface p-5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold">Balance</span>
-          <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-muted">30D</span>
-        </div>
-        <div className="mt-2"><Sparkline values={SPARK} color="var(--chart)" height={52} /></div>
-        <p className="num mt-1 text-2xl font-semibold">$3,7 M</p>
-        <p className="num text-xs font-semibold text-pos">▲ 13.5%</p>
+    <aside
+      className="relative m-4 hidden flex-col gap-7 overflow-hidden rounded-[40px] px-10 pb-10 pt-9 lg:flex"
+      style={{ background: "linear-gradient(180deg,#f0fd80 0%,#cdee86 42%,#5fb99b 100%)", color: "#0a0d0c" }}
+    >
+      <div className="flex items-center justify-between">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/logo-light.png" alt="Centimo" className="h-10 w-auto" />
+        <span className="deco-float flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-white/70 pl-1.5 pr-4 text-sm font-semibold">
+          <span className="grid size-7 place-items-center rounded-full bg-[#0a0d0c] text-[11px] text-[#eefc7a]">▲</span>Ahorro 13.5% este mes
+        </span>
       </div>
-      <div className="grad-card flex flex-col justify-between rounded-[28px] p-5">
-        <p className="muted-ink text-xs font-medium">Ahorro del mes</p>
-        <p className="num text-5xl font-semibold tracking-tight">68%</p>
-        <div className="border-t border-dashed border-black/25 pt-2">
-          <p className="text-sm font-semibold">Vas muy bien</p>
-          <p className="muted-ink text-xs">Gastas menos que el mes pasado</p>
-        </div>
+
+      <div className="flex flex-col gap-3.5">
+        <h2 className="text-[clamp(52px,5.6vw,78px)] font-semibold leading-[.96] tracking-[-0.01em]">
+          Tu dinero,<br />
+          <span className="inline-flex items-center gap-[18px]">bajo
+            <span className="inline-grid h-[clamp(44px,4.8vw,62px)] w-[clamp(88px,9.6vw,124px)] shrink-0 place-items-center rounded-full bg-[#0a0d0c] text-[#eefc7a]">
+              <AnimatedIcon name="adelante" strokeWidth={2.2} className="size-[34px]" />
+            </span>
+          </span><br />control.
+        </h2>
+        <p className="max-w-[440px] text-lg leading-[1.4] text-[#0a0d0c]/60">Registra gastos, programa pagos y entiende tus finanzas con una vista clara y rápida.</p>
       </div>
-      <div className="col-span-2 divide-y divide-line/60 rounded-[28px] bg-surface px-5 py-2 shadow-sm">
-        {[
-          { Icon: Utensils, name: "Domicilio", cat: "Comida", amount: "−$ 45.500", tone: "#ff6b35" },
-          { Icon: Home, name: "Arriendo", cat: "Hogar", amount: "−$ 1.150.000", tone: "#4d7cff" },
-        ].map(({ Icon, name, cat, amount, tone }) => (
-          <div key={name} className="flex items-center gap-3 py-3">
-            <span className="grid size-11 place-items-center rounded-full" style={{ background: `color-mix(in srgb, ${tone} 16%, transparent)`, color: tone }}>
-              <Icon className="size-5" />
+
+      <div className="mt-auto flex items-center gap-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[#0a0d0c]/60">
+        Así funciona<span className="h-0 flex-1 border-t-2 border-dashed border-[#0a0d0c]/30" />3 pasos
+      </div>
+      <div className="mt-1.5 grid grid-cols-3 items-end gap-3.5">
+        {STEPS.map((s, i) => (
+          <div key={s.n} className={cn("flex flex-col gap-2 rounded-[30px] bg-white p-3.5", i === 1 && "-translate-y-7 shadow-[0_24px_40px_-24px_rgb(10_30_25/0.45)]")}>
+            <div className="flex items-center gap-2">
+              <span className="num grid size-[34px] shrink-0 place-items-center rounded-full bg-[#0a0d0c] text-[13px] font-bold text-[#eefc7a]">{s.n}</span>
+              <span className="text-[19px] font-semibold">{s.title}</span>
+            </div>
+            <span className="grid aspect-square place-items-center rounded-[22px] bg-[#eef2f1]"><Avatar n={s.avatar} className="size-[94%]" /></span>
+            <span className={cn("flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-2.5", s.tone === "dark" ? "bg-[#0a0d0c] text-white" : "bg-[#eef2f1] text-[#0a0d0c]")}>
+              <span className="grid size-[30px] shrink-0 place-items-center rounded-full bg-[#eefc7a] text-[#0a0d0c]"><AnimatedIcon name={s.icon} strokeWidth={1.9} className="size-[15px]" /></span>
+              <span className="flex min-w-0 flex-col leading-[1.15]">
+                <span className="num whitespace-nowrap text-[13px] font-semibold">{s.value}</span>
+                <span className="whitespace-nowrap text-[11px] opacity-60">{s.sub}</span>
+              </span>
             </span>
-            <span className="min-w-0 flex-1 leading-tight">
-              <span className="block text-sm font-semibold">{name}</span>
-              <span className="text-xs text-muted">{cat}</span>
-            </span>
-            <span className="num text-sm font-semibold">{amount}</span>
           </div>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[1.05fr_1fr]">
-      {/* Panel de marca (escritorio) */}
-      <aside className="relative m-4 hidden flex-col justify-between gap-10 overflow-hidden rounded-[40px] bg-panel p-10 xl:p-12 lg:flex">
-        <Logo className="[&_img]:h-12" />
-        <div className="space-y-8">
-          <div>
-            <h2 className="max-w-md text-5xl font-semibold leading-[1.04] tracking-tight xl:text-6xl">Tu dinero,<br />bajo control.</h2>
-            <p className="mt-4 max-w-sm text-ink/60">Registra gastos, programa pagos y entiende tus finanzas con una vista clara y rápida.</p>
-          </div>
-          <Showcase />
-        </div>
-        <p className="text-xs text-ink/50">© {new Date().getFullYear()} Centimo</p>
-      </aside>
-
-      <main className="flex min-h-dvh flex-col bg-panel lg:relative lg:min-h-0 lg:bg-transparent">
-        {/* Cabecera móvil */}
-        <div className="pt-safe-lg px-5 pb-8 lg:hidden">
-          <div className="flex items-center justify-between">
-            <Logo className="[&_img]:h-10" />
-            <ThemeToggleIcon />
-          </div>
-        </div>
-        <div className="absolute right-6 top-5 hidden lg:block"><ThemeToggleIcon /></div>
-
-        <div className="flex flex-1 flex-col rounded-t-[40px] bg-surface px-5 pb-10 pt-8 shadow-[0_-12px_32px_-20px_rgb(10_30_25/0.25)] lg:items-center lg:justify-center lg:rounded-none lg:bg-transparent lg:px-8 lg:py-10 lg:shadow-none">
-          <div className="mx-auto w-full max-w-[26rem] lg:rounded-[40px] lg:border lg:border-line/70 lg:bg-surface lg:p-9 lg:shadow-[var(--shadow-card)]">
-            {isDemo && (
-              <div className="mb-5 flex items-center gap-2 rounded-full bg-lime px-4 py-2.5 text-xs font-medium text-lime-ink">
-                <span className="pulse-dot size-1.5 shrink-0 rounded-full bg-black" />
-                Modo demo: cualquier dato te deja entrar.
-              </div>
-            )}
-            {children}
-          </div>
+    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[1.05fr_1fr]">
+      <Showcase />
+      <main className="relative flex min-h-dvh flex-col lg:min-h-0 lg:items-center lg:justify-center lg:p-6">
+        <div className="absolute right-7 top-7 hidden lg:block"><ThemeToggleIcon /></div>
+        <div className="flex w-full flex-1 flex-col px-5 pb-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] lg:w-[410px] lg:flex-none lg:p-0">
+          {isDemo && (
+            <div className="mb-3 flex items-center gap-2 rounded-full bg-lime px-4 py-2.5 text-xs font-medium text-lime-ink">
+              <span className="pulse-dot size-1.5 shrink-0 rounded-full bg-black" />
+              Modo demo: cualquier dato te deja entrar.
+            </div>
+          )}
+          {children}
         </div>
       </main>
     </div>

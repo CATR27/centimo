@@ -3,6 +3,7 @@
 import { Download, LogOut, Tags } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { HeroBanner } from "@/components/design";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, SectionTitle } from "@/components/ui/card";
@@ -40,8 +41,13 @@ export default function Ajustes() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       <PageHeader title="Ajustes" />
+      <HeroBanner tone="lime" avatar={16}>
+        <span className="text-[13px] font-semibold uppercase tracking-[0.14em] muted-ink">Tu cuenta</span>
+        <span className="truncate text-2xl font-semibold leading-tight">{settings.displayName || "Trader"}</span>
+        <span className="muted-ink text-[13px]">Moneda {settings.currency}</span>
+      </HeroBanner>
       <Card className="space-y-3">
         <SectionTitle>Perfil</SectionTitle>
         <Input defaultValue={settings.displayName} placeholder="Tu nombre" maxLength={40} aria-label="Nombre"
@@ -70,14 +76,14 @@ export default function Ajustes() {
         <div className="grid grid-cols-3 gap-2">
           {CURRENCIES.map((c) => (
             <button key={c.code} onClick={() => updateSettings({ currency: c.code })} aria-pressed={settings.currency === c.code} title={c.label}
-              className={cn("num h-12 rounded-xl border text-sm font-medium transition", settings.currency === c.code ? "border-accent/60 bg-accent/15 text-accent" : "border-line text-muted")}>
+              className={cn("num grid h-12 place-items-center rounded-full text-sm font-semibold transition", settings.currency === c.code ? "bg-accent text-accent-ink" : "bg-surface-2 text-muted")}>
               {c.code}
             </button>
           ))}
         </div>
         <p className="mt-2 text-xs text-muted">Cambiar la moneda solo cambia el formato; no convierte los montos.</p>
       </Card>
-      <Card className="divide-y divide-line/60 p-0">
+      <Card className="divide-y divide-line p-0">
         <Link href="/categorias" className="flex h-14 items-center gap-3 px-4 text-sm"><Tags className="size-5 text-muted" /> Gestionar categorías</Link>
         <button onClick={exportCsv} className="flex h-14 w-full items-center gap-3 px-4 text-left text-sm"><Download className="size-5 text-muted" /> Exportar CSV</button>
       </Card>

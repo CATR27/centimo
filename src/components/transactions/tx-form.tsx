@@ -233,13 +233,13 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
 
       <input
         value={note} onChange={(e) => setNote(e.target.value)} maxLength={80} placeholder="Nota (opcional)"
-        className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
+        className="h-13 min-h-[3.25rem] w-full rounded-full bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
       />
 
       <input
         value={tagsText} onChange={(e) => setTagsText(e.target.value)} maxLength={80} placeholder="Etiquetas: #viaje #trabajo"
         aria-label="Etiquetas"
-        className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
+        className="h-13 min-h-[3.25rem] w-full rounded-full bg-surface px-4 text-base outline-none placeholder:text-muted/80 focus:ring-2 focus:ring-ink/20"
       />
 
       <div className="grid grid-cols-2 gap-2">
@@ -247,7 +247,7 @@ function Form({ opts, onClose }: { opts: OpenOpts; onClose: () => void }) {
           <span className="mb-1 block px-1 text-xs text-muted">Fecha</span>
           <input
             type="date" value={date} onChange={(e) => setDate(e.target.value)}
-            className="h-13 min-h-[3.25rem] w-full rounded-2xl bg-surface px-3 text-base outline-none focus:ring-2 focus:ring-ink/20"
+            className="h-13 min-h-[3.25rem] w-full rounded-full bg-surface px-3 text-base outline-none focus:ring-2 focus:ring-ink/20"
           />
         </label>
         <div>
