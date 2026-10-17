@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: { default: "Centimo", template: "%s · Centimo" },
   description: "Controla tus gastos con precisión de trader.",
   applicationName: "Centimo",
+  icons: {
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: { capable: true, title: "Centimo", statusBarStyle: "black-translucent" },
 };
 
