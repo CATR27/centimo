@@ -1,12 +1,12 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { AnimatedIcon } from "@/components/animated-icon";
+import { Avatar } from "@/components/avatar";
 import { NAV_GROUPS } from "@/components/layout/nav-config";
 import { useQuickAdd } from "@/components/transactions/quick-add";
-import { Delta, Skeleton } from "@/components/ui/misc";
+import { Skeleton } from "@/components/ui/misc";
 import { BudgetAlertsCard, InsightsCard } from "@/components/widgets";
 import { delta, totals, upcoming } from "@/lib/analytics";
 import { periodRanges, relativeDay } from "@/lib/dates";
@@ -30,31 +30,35 @@ export default function Hub() {
 
   const name = settings.displayName.split(" ")[0];
   const sections = NAV_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.href !== "/hub") })).filter((g) => g.items.length);
+  const dl = delta(m.now.expense, m.before.expense);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">{name ? `Hola, ${name}` : "Hub"}</h1>
-        <p className="text-sm text-muted">Todo tu dinero en un solo lugar</p>
+    <div className="mx-auto max-w-3xl space-y-4">
+      <header className="flex items-center gap-3">
+        <span className="flex flex-1 flex-col">
+          <span className="text-[32px] font-semibold leading-[1.05]">{name ? `Hola, ${name}` : "Hub"}</span>
+          <span className="text-[15px] text-muted">Todo tu dinero en un solo lugar</span>
+        </span>
+        <Avatar n={11} className="size-16" />
       </header>
 
       {/* Estado del mes */}
-      <section className="rounded-[40px] bg-panel p-5" aria-label="Estado del mes">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink/50">Este mes</p>
-        <p className="num mt-2 truncate text-[clamp(2.2rem,10vw,3.5rem)] font-semibold leading-none tracking-tight">{formatMoney(m.now.expense, cur)}</p>
-        <p className="mt-2 flex items-center gap-2 text-xs text-ink/60">
-          <Delta value={delta(m.now.expense, m.before.expense)} invert /> de gasto vs mes anterior
+      <section className="grad-card rounded-[32px] p-[18px]" aria-label="Estado del mes">
+        <span className="text-[13px] font-semibold uppercase tracking-[0.14em] muted-ink">Este mes</span>
+        <p className="num mt-1.5 truncate text-[44px] font-semibold leading-none">{formatMoney(m.now.expense, cur)}</p>
+        <p className="muted-ink mt-1.5 text-[13px]">
+          <span className="num font-bold">{dl === null ? "—" : `${dl <= 0 ? "▼" : "▲"} ${Math.abs(dl).toFixed(1)}%`}</span> de gasto vs mes anterior
         </p>
 
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button onClick={() => open({ type: "expense" })} className="h-14 rounded-full bg-accent text-base font-semibold text-accent-ink active:scale-[0.98]">Gasto</button>
+        <div className="mt-3.5 grid grid-cols-2 gap-2">
+          <button onClick={() => open({ type: "expense" })} className="grid h-[54px] place-items-center rounded-full bg-accent text-base font-semibold text-accent-ink active:scale-[0.98]">Gasto</button>
           <button onClick={() => open({ type: "income" })}
-            className="flex h-14 items-center justify-between rounded-full bg-lime pl-5 pr-2 text-base font-semibold text-lime-ink active:scale-[0.98]">
-            Ingreso <span className="grid size-10 place-items-center rounded-full bg-white/60"><Plus className="size-5" /></span>
+            className="flex h-[54px] items-center justify-between rounded-full bg-white pl-5 pr-[7px] text-base font-semibold text-[#0a0d0c] active:scale-[0.98]">
+            Ingreso <span className="grid size-10 place-items-center rounded-full bg-[#0a0d0c] text-lime"><AnimatedIcon name="nuevo" strokeWidth={2.4} className="size-[18px]" /></span>
           </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-3 text-center">
+        <div className="mt-2 grid grid-cols-3 gap-2 text-center">
           <Stat label="Ingresos" value={formatCompact(m.now.income, cur)} />
           <Stat label="Balance" value={formatCompact(m.now.net, cur)} tone={m.now.net < 0 ? "neg" : undefined} />
           <Stat label="Próximo" value={m.next ? relativeDay(m.next.date) : "—"} sub={m.next ? formatCompact(m.next.amount, cur) : undefined} />
@@ -64,18 +68,17 @@ export default function Hub() {
       <InsightsCard limit={3} />
       <BudgetAlertsCard />
 
-      {/* Accesos */}
+      {/* Accesos circulares */}
       {sections.map((g) => (
-        <section key={g.title} aria-label={g.title}>
-          <h2 className="mb-3 px-1 text-xs font-bold uppercase tracking-[0.14em] text-muted">{g.title}</h2>
-          <div className="grid grid-cols-3 gap-3">
+        <section key={g.title} aria-label={g.title} className="flex flex-col gap-2.5">
+          <h2 className="px-1 text-[13px] font-bold uppercase tracking-[0.16em] text-muted">{g.title}</h2>
+          <div className="grid grid-cols-4 gap-x-1.5 gap-y-3">
             {g.items.map((n) => (
-              <Link key={n.href} href={n.href}
-                className="neon-card flex aspect-square flex-col items-center justify-center gap-3 rounded-[28px] border border-line/70 bg-surface p-3 text-center transition active:scale-[0.97]">
-                <span className="grid size-12 place-items-center rounded-full bg-accent text-accent-ink">
+              <Link key={n.href} href={n.href} className="group flex flex-col items-center gap-1.5 text-center text-[13px] font-semibold transition active:scale-95">
+                <span className="grid size-[66px] place-items-center rounded-full bg-surface transition group-hover:bg-lime group-hover:text-lime-ink">
                   <AnimatedIcon name={n.icon} className="size-6" />
                 </span>
-                <span className="text-[13px] font-semibold leading-tight">{n.label}</span>
+                {n.label}
               </Link>
             ))}
           </div>
@@ -87,10 +90,10 @@ export default function Hub() {
 
 function Stat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "neg" }) {
   return (
-    <div className="rounded-[24px] bg-surface px-2 py-3 shadow-sm">
-      <p className="text-[11px] font-medium text-muted">{label}</p>
-      <p className={cn("num mt-1 truncate text-[15px] font-semibold", tone === "neg" && "text-neg")}>{value}</p>
-      {sub && <p className="num text-[11px] text-muted">{sub}</p>}
+    <div className="flex flex-col rounded-[22px] bg-white/75 px-2 py-2.5 text-center text-[#0a0d0c]">
+      <span className="text-[11px] text-[#5d6865]">{label}</span>
+      <span className={cn("num truncate text-base font-semibold", tone === "neg" && "text-[#d6456f]")}>{value}</span>
+      {sub && <span className="num text-[11px] text-[#5d6865]">{sub}</span>}
     </div>
   );
 }

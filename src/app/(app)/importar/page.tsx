@@ -4,6 +4,7 @@ import { FileUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
+import { HeroBanner } from "@/components/design";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, SectionTitle } from "@/components/ui/card";
@@ -77,7 +78,7 @@ export default function Importar() {
     <label key={key} className="block">
       <span className="mb-1 block px-1 text-xs text-muted">{label}{hint && <span className="opacity-70"> · {hint}</span>}</span>
       <select value={cols?.[key] ?? -1} onChange={(e) => setMap({ ...(cols as ColumnMap), [key]: Number(e.target.value) })}
-        className="h-12 w-full rounded-2xl bg-surface-2 px-3 text-base outline-none focus:ring-2 focus:ring-ink/20">
+        className="h-12 w-full rounded-full bg-surface-2 px-4 text-base outline-none focus:ring-2 focus:ring-ink/20">
         <option value={-1}>— ninguna —</option>
         {header.map((h, i) => <option key={i} value={i}>{h || `Columna ${i + 1}`}</option>)}
       </select>
@@ -85,11 +86,15 @@ export default function Importar() {
   );
 
   return (
-    <div>
+    <div className="space-y-3.5">
       <PageHeader title="Importar" sub="Trae movimientos desde el CSV de tu banco" />
+      <HeroBanner tone="lime" avatar={6}>
+        <span className="text-2xl font-semibold leading-tight">Importa tu extracto</span>
+        <span className="muted-ink text-[13px]">CSV del banco · se detectan columnas, fechas y duplicados</span>
+      </HeroBanner>
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div className="space-y-6">
-          <Card className="rounded-[36px]">
+          <Card>
             <SectionTitle>1 · Archivo</SectionTitle>
             <label className="flex cursor-pointer flex-col items-center gap-2 rounded-[28px] border-2 border-dashed border-muted/40 px-4 py-8 text-center transition hover:border-ink/50">
               <span className="grid size-12 place-items-center rounded-full bg-accent text-accent-ink"><FileUp className="size-5" /></span>
@@ -103,7 +108,7 @@ export default function Importar() {
           </Card>
 
           {parsed && cols && (
-            <Card className="rounded-[36px]">
+            <Card>
               <SectionTitle>2 · Columnas</SectionTitle>
               <p className="mb-3 text-xs text-muted">{body.length} filas · separador «{parsed.delimiter === "\t" ? "tab" : parsed.delimiter}»</p>
               <div className="grid gap-3 sm:grid-cols-2">{FIELDS.map((f) => select(f.key, f.label, f.hint))}</div>
@@ -123,7 +128,7 @@ export default function Importar() {
           )}
         </div>
 
-        <Card className="rounded-[36px]">
+        <Card>
           <SectionTitle>3 · Vista previa</SectionTitle>
           {!result ? (
             <p className="py-8 text-center text-sm text-muted">{parsed ? "Elige las columnas de fecha y monto para ver la vista previa." : "Carga un archivo para empezar."}</p>

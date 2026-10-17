@@ -10,7 +10,7 @@ export const toISO = (d: Date) => format(d, ISO);
 export const today = () => toISO(new Date());
 export const parse = (s: string) => parseISO(s);
 
-export type Period = "7D" | "30D" | "MES" | "AÑO";
+export type Period = "7D" | "30D" | "MES" | "TRI" | "AÑO";
 export const PERIODS: Period[] = ["7D", "30D", "MES", "AÑO"];
 
 export interface Range { from: string; to: string }
@@ -23,6 +23,8 @@ export function periodRanges(p: Period, now = new Date()): { current: Range; pre
     case "30D": to = now; from = subDays(now, 29); pTo = subDays(from, 1); pFrom = subDays(pTo, 29); break;
     case "MES": from = startOfMonth(now); to = endOfMonth(now);
       pFrom = startOfMonth(subMonths(now, 1)); pTo = endOfMonth(subMonths(now, 1)); break;
+    case "TRI": from = startOfMonth(subMonths(now, 2)); to = endOfMonth(now);
+      pFrom = startOfMonth(subMonths(now, 5)); pTo = endOfMonth(subMonths(now, 3)); break;
     case "AÑO": from = startOfYear(now); to = endOfYear(now);
       pFrom = startOfYear(subYears(now, 1)); pTo = endOfYear(subYears(now, 1)); break;
   }

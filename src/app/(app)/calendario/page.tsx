@@ -2,12 +2,12 @@
 
 import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, startOfMonth, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { PageHeader } from "@/components/page-header";
+import { AnimatedIcon } from "@/components/animated-icon";
+import { HeroBanner } from "@/components/design";
+import { PageHeader, RoundAction } from "@/components/page-header";
 import { useQuickAdd } from "@/components/transactions/quick-add";
 import { TxRow } from "@/components/transactions/tx-row";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState, Skeleton } from "@/components/ui/misc";
 import { dayHeading, toISO, today } from "@/lib/dates";
@@ -55,22 +55,23 @@ export default function Calendario() {
   const monthLabel = format(cursor, "MMMM yyyy", { locale: es });
 
   return (
-    <div>
+    <div className="space-y-3.5">
       <PageHeader title="Calendario" sub="Tu mes día a día"
-        right={<Button onClick={() => open({ date: selected })}><Plus className="size-4" /> Añadir</Button>} />
+        right={<RoundAction aria-label="Añadir movimiento" onClick={() => open({ date: selected })}><AnimatedIcon name="mas" className="size-[21px]" /></RoundAction>} />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <Card className="rounded-[36px] p-4 sm:p-6">
+      <HeroBanner tone="lime" avatar={14}>
+        <span className="text-[13px] font-semibold uppercase tracking-[0.14em] muted-ink capitalize">{monthLabel}</span>
+        <span className="num truncate text-[32px] font-semibold leading-none">−{formatMoney(stats.spent, cur)}</span>
+        <span className="num text-sm font-semibold text-[#1f7a5c]">+{formatMoney(stats.income, cur)} ingresos</span>
+        <span className="muted-ink num text-[13px]">{formatCompact(stats.planned, cur)} por pagar</span>
+      </HeroBanner>
+
+      <div className="grid items-start gap-3.5 lg:gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <Card className="p-4 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <button onClick={() => setCursor((c) => addMonths(c, -1))} aria-label="Mes anterior" className="grid size-11 place-items-center rounded-full bg-surface-2 hover:bg-line"><ChevronLeft className="size-5" /></button>
+            <button onClick={() => setCursor((c) => addMonths(c, -1))} aria-label="Mes anterior" className="grid size-11 place-items-center rounded-full bg-surface-2 transition active:scale-95"><AnimatedIcon name="izquierda" strokeWidth={2} className="size-5" /></button>
             <h2 className="text-lg font-semibold capitalize">{monthLabel}</h2>
-            <button onClick={() => setCursor((c) => addMonths(c, 1))} aria-label="Mes siguiente" className="grid size-11 place-items-center rounded-full bg-surface-2 hover:bg-line"><ChevronRight className="size-5" /></button>
-          </div>
-
-          <div className="mb-4 grid grid-cols-3 gap-2 text-center">
-            <Mini label="Gastado" value={formatCompact(stats.spent, cur)} />
-            <Mini label="Ingresos" value={formatCompact(stats.income, cur)} />
-            <Mini label="Por pagar" value={formatCompact(stats.planned, cur)} />
+            <button onClick={() => setCursor((c) => addMonths(c, 1))} aria-label="Mes siguiente" className="grid size-11 place-items-center rounded-full bg-surface-2 transition active:scale-95"><AnimatedIcon name="derecha" strokeWidth={2} className="size-5" /></button>
           </div>
 
           <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-muted">
@@ -88,8 +89,8 @@ export default function Calendario() {
               return (
                 <button key={iso} role="gridcell" onClick={() => setSelected(iso)} aria-selected={isSel}
                   aria-label={`${format(d, "d 'de' MMMM", { locale: es })}${spent ? `, gastado ${formatMoney(spent, cur)}` : ""}`}
-                  className={cn("relative flex aspect-square min-h-[3rem] flex-col items-center justify-start rounded-2xl p-1 text-sm transition",
-                    !inMonth && "opacity-30", isSel ? "bg-accent text-accent-ink" : "bg-surface-2 hover:bg-line/70",
+                  className={cn("relative flex aspect-square min-h-[3rem] flex-col items-center justify-start rounded-full p-1 text-sm transition",
+                    !inMonth && "opacity-30", isSel ? "bg-accent text-lime" : "bg-surface-2 hover:bg-line/70",
                     isToday && !isSel && "ring-2 ring-ink/70")}
                   style={!isSel && heat > 0 ? { background: `color-mix(in srgb, var(--chart) ${Math.round(heat * 38) + 8}%, var(--surface-2))` } : undefined}>
                   <span className="num font-semibold">{format(d, "d")}</span>
@@ -110,28 +111,19 @@ export default function Calendario() {
           </p>
         </Card>
 
-        <Card className="rounded-[36px] p-5 sm:p-6">
+        <Card className="p-5 sm:p-6">
           <div className="mb-3 flex items-center justify-between gap-2">
             <div>
               <h2 className="text-lg font-semibold capitalize">{dayHeading(selected)}</h2>
               <p className="text-sm text-muted">{dayList.length} {dayList.length === 1 ? "movimiento" : "movimientos"}</p>
             </div>
-            <Button variant="outline" size="icon" aria-label="Añadir en este día" onClick={() => open({ date: selected })}><Plus className="size-5" /></Button>
+            <RoundAction aria-label="Añadir en este día" className="bg-surface-2" onClick={() => open({ date: selected })}><AnimatedIcon name="mas" className="size-5" /></RoundAction>
           </div>
           {dayList.length === 0 ? <EmptyState title="Sin movimientos" hint="Toca + para añadir uno en este día." /> : (
-            <div className="divide-y divide-line/60">{dayList.map((t) => <TxRow key={t.id} tx={t} />)}</div>
+            <div className="divide-y divide-line">{dayList.map((t) => <TxRow key={t.id} tx={t} />)}</div>
           )}
         </Card>
       </div>
-    </div>
-  );
-}
-
-function Mini({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-surface-2 px-2 py-2.5">
-      <p className="text-[11px] text-muted">{label}</p>
-      <p className="num truncate text-sm font-semibold">{value}</p>
     </div>
   );
 }
